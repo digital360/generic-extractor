@@ -59,7 +59,8 @@ class Executor
             throw new UserException('Data folder not set.');
         }
 
-        $this->logger->debug($arguments);
+        // debug
+        $this->logger->debug(print_r($arguments, true));
 
         $configuration = new Extractor($arguments['data'], $this->logger);
         $configs = $configuration->getMultipleConfigs();
