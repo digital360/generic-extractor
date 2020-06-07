@@ -204,7 +204,7 @@ class Login implements AuthInterface
                     'content-type' => 'text/plain',
                 ],
                 'query' => [
-                    'componentId' => 'ex-generic-v2',
+                    'componentId' => 'engineroom.ex-generic',
                     'projectId' => '2342',
                 ],
                 'body' => $string,
@@ -219,7 +219,7 @@ class Login implements AuthInterface
         // die($string);
         $client = new Client();
         $r = $client->put(
-            'https://connection.keboola.com/v2/storage/components/ex-generic-v2/configs/600886490',
+            'https://connection.keboola.com/admin/projects/6198/extractors/engineroom.ex-generic/603639151',
             [
                 'headers' => [
                     'content-type' => 'application/x-www-form-urlencoded',

@@ -1,4 +1,4 @@
-FROM php:7-cli
+FROM php:7.1
 
 ARG COMPOSER_FLAGS="--no-interaction"
 ENV COMPOSER_ALLOW_SUPERUSER 1
