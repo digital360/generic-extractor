@@ -1,7 +1,3 @@
-vendor/
-/data/
-.idea/
-.tmp
-/doc/examples/*/out/state.json
-/doc/examples/*/out/tables/*
-/build/logs
+/vendor
+/data
+.idea
