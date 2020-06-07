@@ -136,6 +136,10 @@ class Extractor
      */
     private function getConfig(array $params) : Config
     {
+
+        $this->logger->debug($params);
+        $this->logger->debug($this->config);
+
         if (empty($this->config['parameters']['config'])) {
             throw new UserException("The 'config' section is required in the configuration.");
         }

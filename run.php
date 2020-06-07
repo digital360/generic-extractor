@@ -10,7 +10,7 @@ require_once(__DIR__ . "/vendor/autoload.php");
 $logger = new Monolog\Logger("logger");
 $stream = fopen('php://stdout', 'r');
 $logger->pushHandler(new \Monolog\Handler\StreamHandler($stream));
-//$logger->debug("Starting up");
+$logger->debug("Starting up");
 
 try {
     $executor = new Executor($logger);
