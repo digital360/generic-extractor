@@ -53,6 +53,10 @@ class Extractor
         $this->config = $this->loadConfigFile($dataDir);
         $this->state = $this->loadStateFile($dataDir);
         $this->dataDir = $dataDir;
+
+        // debug
+        $this->logger->debug($dataDir);
+        $this->logger->debug(json_encode($this->config));
     }
 
     /**
@@ -136,10 +140,6 @@ class Extractor
      */
     private function getConfig(array $params) : Config
     {
-
-        $this->logger->debug(print_r($params,true));
-        $this->logger->debug(print_r($this->config,true));
-
         if (empty($this->config['parameters']['config'])) {
             throw new UserException("The 'config' section is required in the configuration.");
         }
