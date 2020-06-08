@@ -70,6 +70,10 @@ class Extractor
         if (!file_exists($fileName)) {
             throw new ApplicationException("Configuration file '$fileName' not found.");
         }
+
+        $this->logger->debug('===================================');
+        $this->logger->debug(file_get_contents($fileName));
+
         $data = json_decode(file_get_contents($fileName), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new ApplicationException("Configuration file is not a valid JSON: " . json_last_error_msg());

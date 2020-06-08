@@ -132,6 +132,13 @@ class Api
             case 'oauth20':
                 return new Authentication\OAuth20($configAttributes, $authorization, $api['authentication']);
             case 'oauth20.login':
+
+                $this->logger->debug('=============================');
+                $this->logger->debug(json_encode($configAttributes));
+                $this->logger->debug('=============================');
+                $this->logger->debug(json_encode($authorization));
+                $this->logger->debug('=============================');
+                $this->logger->debug(json_encode($api));
                 return new Authentication\OAuth20Login($configAttributes, $authorization, $api['authentication']);
             default:
                 throw new UserException("Unknown authorization type '{$api['authentication']['type']}'.");

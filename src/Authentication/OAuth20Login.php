@@ -6,6 +6,7 @@ use Keboola\GenericExtractor\Configuration\UserFunction;
 use Keboola\GenericExtractor\Exception\UserException;
 use Keboola\Juicer\Client\RestRequest;
 use Keboola\Utils\Exception\JsonDecodeException;
+use Monolog\Logger;
 
 /**
  * config:
@@ -45,6 +46,7 @@ class OAuth20Login extends Login
     public function __construct(array $configAttributes, array $authorization, array $authentication)
     {
         parent::__construct($configAttributes, $authentication);
+
         if (empty($authorization['oauth_api']['credentials'])) {
             throw new UserException("OAuth API credentials not supplied in config");
         }
