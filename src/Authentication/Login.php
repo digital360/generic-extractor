@@ -232,38 +232,38 @@ class Login implements AuthInterface
         return $r->getBody()->getContents();
     }
 
-    private function loadConfigFile(string $dataDir): array
-    {
-        $data = $this->loadJSONFile($dataDir, 'config.json');
-        $processor = new Processor();
-        try {
-            $processor->processConfiguration(new ConfigFile(), $data);
-        } catch (InvalidConfigurationException $e) {
-            // TODO: create issue to make this strict
-            //$this->logger->warning("Configuration file configuration is invalid: " . $e->getMessage());
-        }
-
-        return $data;
-    }
+//    private function loadConfigFile(string $dataDir): array
+//    {
+//        $data = $this->loadJSONFile($dataDir, 'config.json');
+//        $processor = new Processor();
+//        try {
+//            $processor->processConfiguration(new ConfigFile(), $data);
+//        } catch (InvalidConfigurationException $e) {
+//            // TODO: create issue to make this strict
+//            //$this->logger->warning("Configuration file configuration is invalid: " . $e->getMessage());
+//        }
+//
+//        return $data;
+//    }
 
     /**
      * @param  string  $dataDir
      * @param  string  $name
      * @return array
      */
-    private function loadJSONFile(string $dataDir, string $name): array
-    {
-        $fileName = $dataDir.DIRECTORY_SEPARATOR.$name;
-        if (!file_exists($fileName)) {
-            throw new ApplicationException("Configuration file '$fileName' not found.");
-        }
-        $data = json_decode(file_get_contents($fileName), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new ApplicationException("Configuration file is not a valid JSON: ".json_last_error_msg());
-        }
-
-        return $data;
-    }
+//    private function loadJSONFile(string $dataDir, string $name): array
+//    {
+//        $fileName = $dataDir.DIRECTORY_SEPARATOR.$name;
+//        if (!file_exists($fileName)) {
+//            throw new ApplicationException("Configuration file '$fileName' not found.");
+//        }
+//        $data = json_decode(file_get_contents($fileName), true);
+//        if (json_last_error() !== JSON_ERROR_NONE) {
+//            throw new ApplicationException("Configuration file is not a valid JSON: ".json_last_error_msg());
+//        }
+//
+//        return $data;
+//    }
 
 
     /**
