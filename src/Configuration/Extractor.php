@@ -53,10 +53,6 @@ class Extractor
         $this->config = $this->loadConfigFile($dataDir);
         $this->state = $this->loadStateFile($dataDir);
         $this->dataDir = $dataDir;
-
-        // debug
-        $this->logger->debug($dataDir);
-        $this->logger->debug(json_encode($this->config));
     }
 
     /**
@@ -71,7 +67,7 @@ class Extractor
             throw new ApplicationException("Configuration file '$fileName' not found.");
         }
 
-        $this->logger->debug('===================================');
+        $this->logger->debug('=========== FILE CONTENT 74 ==============');
         $this->logger->debug(file_get_contents($fileName));
 
         $data = json_decode(file_get_contents($fileName), true);
@@ -144,6 +140,9 @@ class Extractor
      */
     private function getConfig(array $params) : Config
     {
+        $this->logger->debug('=========== $this->config[\'parameters\'][\'config\'] 143 ==============');
+        $this->logger->debug(json_encode($this->config));
+
         if (empty($this->config['parameters']['config'])) {
             throw new UserException("The 'config' section is required in the configuration.");
         }

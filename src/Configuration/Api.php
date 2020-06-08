@@ -133,11 +133,11 @@ class Api
                 return new Authentication\OAuth20($configAttributes, $authorization, $api['authentication']);
             case 'oauth20.login':
 
-                $this->logger->debug('=============================');
+                $this->logger->debug('============= $configAttributes LINE 136 ================');
                 $this->logger->debug(json_encode($configAttributes));
-                $this->logger->debug('=============================');
+                $this->logger->debug('============ $authorization LINE 138 =================');
                 $this->logger->debug(json_encode($authorization));
-                $this->logger->debug('=============================');
+                $this->logger->debug('==============$api LINE 140 ===============');
                 $this->logger->debug(json_encode($api));
                 return new Authentication\OAuth20Login($configAttributes, $authorization, $api['authentication']);
             default:
