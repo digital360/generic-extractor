@@ -8,6 +8,10 @@ services:
       - .tmp:/tmp
       - .:/code
       - ./data:/data
+    command:
+      - /bin/sh
+      - -c
+      - "composer install --no-interaction && php /code/run.php --data=/data"
     tty: true
     stdin_open: true
 
