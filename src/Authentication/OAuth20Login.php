@@ -98,8 +98,6 @@ class OAuth20Login extends Login
     {
         // call login's method
         parent::authenticateClient($client);
-
-        // add a subscriber to update state.json
         $client->getClient()->getEmitter()->attach(new OAuthResponseSubscriber());
     }
 }

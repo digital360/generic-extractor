@@ -130,6 +130,14 @@ class Extractor
     }
 
     /**
+     * @return Config[]
+     */
+    public function getFullConfigArray()
+    {
+        return $this->config;
+    }
+
+    /**
      * @param array $params Values to override those in the config
      * @return Config
      * @throws UserException
