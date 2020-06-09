@@ -4,6 +4,8 @@ namespace Keboola\GenericExtractor\Authentication;
 
 use Keboola\GenericExtractor\Configuration\UserFunction;
 use Keboola\GenericExtractor\Exception\UserException;
+use Keboola\GenericExtractor\Subscriber\OAuthResponseSubscriber;
+use Keboola\Juicer\Client\RestClient;
 use Keboola\Juicer\Client\RestRequest;
 use Keboola\Utils\Exception\JsonDecodeException;
 
@@ -37,9 +39,9 @@ class OAuth20Login extends Login
 
     /**
      * OAuth20Login constructor.
-     * @param array $configAttributes
-     * @param array $authorization
-     * @param array $authentication
+     * @param  array  $configAttributes
+     * @param  array  $authorization
+     * @param  array  $authentication
      * @throws UserException
      */
     public function __construct(array $configAttributes, array $authorization, array $authentication)
@@ -64,20 +66,20 @@ class OAuth20Login extends Login
 
         $consumerData = [
             'client_id' => $oauthApiDetails['appKey'],
-            'client_secret' => $oauthApiDetails['#appSecret']
+            'client_secret' => $oauthApiDetails['#appSecret'],
         ];
 
         $this->params = [
             'consumer' => $consumerData,
             'user' => $oAuthData,
-            'attr' => $this->configAttributes
+            'attr' => $this->configAttributes,
         ];
     }
 
     /**
      * @inheritdoc
      */
-    protected function getAuthRequest(array $config) : RestRequest
+    protected function getAuthRequest(array $config): RestRequest
     {
         if (!empty($config['params'])) {
             $config['params'] = UserFunction::build($config['params'], $this->params);
@@ -87,5 +89,17 @@ class OAuth20Login extends Login
         }
 
         return new RestRequest($config);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function authenticateClient(RestClient $client)
+    {
+        // call login's method
+        parent::authenticateClient($client);
+
+        // add a subscriber to update state.json
+        $client->getClient()->getEmitter()->attach(new OAuthResponseSubscriber());
     }
 }
