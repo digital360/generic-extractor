@@ -53,6 +53,8 @@ class Extractor
         $this->config = $this->loadConfigFile($dataDir);
         $this->state = $this->loadStateFile($dataDir);
         $this->dataDir = $dataDir;
+
+        $logger->info(print_r($this->state));
     }
 
     /**
