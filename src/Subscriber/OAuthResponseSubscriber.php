@@ -30,13 +30,8 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $responseArr = json_decode($jsonResponse, true);
         if (isset($responseArr['refresh_token'])) {
             $this->_response_token = $jsonResponse;
-            $this->updateStateFile();
+            $this->updateConfig();
         }
-    }
-
-    public function getUpdatedToken()
-    {
-        return $this->_response_token;
     }
 
     public function getEncrypted(string $string)
@@ -68,7 +63,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $configuration = new Extractor('/data', $logger);
         $configFile = $configuration->getFullConfigArray();
 
-        $encryptedTokens = $this->getEncrypted();
+        $encryptedTokens = $this->getEncrypted($this->_response_token);
         $encryptedAppSecret = $this->getEncrypted(
             $configFile['authorization']['oauth_api']['credentials']['#appSecret']
         );
