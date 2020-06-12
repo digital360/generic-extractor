@@ -83,6 +83,10 @@ class Extractor
     private function loadConfigFile(string $dataDir): array
     {
         $data = $this->loadJSONFile($dataDir, 'config.json');
+        $stateData = $this->loadJSONFile($dataDir.DIRECTORY_SEPARATOR.'out', 'auth_state.json');
+        if (count($stateData) > 0) {
+            $data = $stateData;
+        }
         $processor = new Processor();
         try {
             $processor->processConfiguration(new ConfigFile(), $data);

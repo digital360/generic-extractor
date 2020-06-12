@@ -54,6 +54,6 @@ class OAuthResponseSubscriber implements SubscriberInterface
         if (!is_dir($dirPath)) {
             mkdir($dirPath);
         }
-        file_put_contents($dirPath.DIRECTORY_SEPARATOR.'state.json', json_encode($configFile));
+        file_put_contents($dirPath.DIRECTORY_SEPARATOR.'auth_state.json', json_encode($configFile));
     }
 }
