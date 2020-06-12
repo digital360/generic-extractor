@@ -39,7 +39,27 @@ class OAuthResponseSubscriber implements SubscriberInterface
         return $this->_response_token;
     }
 
-    public function updateStateFile()
+    public function getEncrypted(string $string)
+    {
+        $client = new Client();
+        $r = $client->post(
+            'https://encryption.keboola.com/encrypt',
+            [
+                'headers' => [
+                    'content-type' => 'text/plain',
+                ],
+                'query' => [
+                    'componentId' => 'engineroom.ex-generic',
+                    'projectId' => '6198',
+                ],
+                'body' => $string,
+            ]
+        );
+
+        return $r->getBody()->getContents();
+    }
+
+    public function updateConfig()
     {
         // load the original config file
         $logger = new Logger("logger");
@@ -48,13 +68,32 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $configuration = new Extractor('/data', $logger);
         $configFile = $configuration->getFullConfigArray();
 
-        $configFile['authorization']['oauth_api']['credentials']['#data'] = $this->getUpdatedToken();
+        $encryptedTokens = $this->getEncrypted();
+        $encryptedAppSecret = $this->getEncrypted(
+            $configFile['authorization']['oauth_api']['credentials']['#appSecret']
+        );
 
-        $dirPath = '/data'.DIRECTORY_SEPARATOR.'out';
-        if (!is_dir($dirPath)) {
-            mkdir($dirPath);
-        }
-        file_put_contents($dirPath.DIRECTORY_SEPARATOR.'auth_state.json', json_encode($configFile));
-        $logger->info('auth_state has been updated');
+        $authData = [];
+        $authData['authorization']['oauth_api']['credentials']['#data'] = $encryptedTokens;
+        $authData['authorization']['oauth_api']['credentials']['#appSecret'] = $encryptedAppSecret;
+
+        echo '====================================';
+        print_r(json_encode(array_merge($configFile, $authData)));
+        echo "\n\n\n";
+
+        $client = new Client();
+        $r = $client->put(
+            'https://connection.keboola.com/v2/storage/components/engineroom.ex-generic/configs/603911685',
+            [
+                'headers' => [
+                    'content-type' => 'application/x-www-form-urlencoded',
+                    'X-StorageApi-Token' => $configFile['config']['componentToken'],
+                ],
+                'body' => 'configuration='.urlencode(json_encode(array_merge($configFile, $authData))).'&changeDescription=Updated via api',
+            ]
+        );
+
+
+        echo $r->getBody()->getContents();
     }
 }
