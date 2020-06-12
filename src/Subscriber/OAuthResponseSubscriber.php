@@ -50,7 +50,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
         $configFile['authorization']['oauth_api']['credentials']['#data'] = $this->getUpdatedToken();
 
-        $dirPath = '/data'.DIRECTORY_SEPARATOR.'out';
+        $dirPath = '/data'.DIRECTORY_SEPARATOR.'in';
         if (!is_dir($dirPath)) {
             mkdir($dirPath);
         }

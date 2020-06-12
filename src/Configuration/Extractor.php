@@ -76,6 +76,8 @@ class Extractor
         return $data;
     }
 
+
+
     /**
      * @param  string  $dataDir
      * @return array
@@ -83,7 +85,7 @@ class Extractor
     private function loadConfigFile(string $dataDir): array
     {
         $data = $this->loadJSONFile($dataDir, 'config.json');
-        $stateData = $this->loadJSONFile($dataDir.DIRECTORY_SEPARATOR.'out', 'auth_state.json');
+        $stateData = $this->loadAuthStateFile($dataDir);
         if (count($stateData) > 0) {
             $data = $stateData;
         }
@@ -106,6 +108,30 @@ class Extractor
     {
         try {
             $data = $this->loadJSONFile($dataDir, 'in'.DIRECTORY_SEPARATOR.'state.json');
+        } catch (ApplicationException $e) {
+            // state file is optional so only log the error
+            $this->logger->warning("State file not found ".$e->getMessage());
+            $data = [];
+        }
+        $processor = new Processor();
+        try {
+            $processor->processConfiguration(new StateFile(), $data);
+        } catch (InvalidConfigurationException $e) {
+            // TODO: create issue to make this strict
+            //$this->logger->warning("State file configuration is invalid: " . $e->getMessage());
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param  string  $dataDir
+     * @return array
+     */
+    private function loadAuthStateFile(string $dataDir): array
+    {
+        try {
+            $data = $this->loadJSONFile($dataDir, 'in'.DIRECTORY_SEPARATOR.'auth_state.json');
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
             $this->logger->warning("State file not found ".$e->getMessage());
