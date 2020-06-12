@@ -75,6 +75,9 @@ class OAuthResponseSubscriber implements SubscriberInterface
         echo '====================================';
         print_r(json_encode(array_merge($configFile, $authData)));
         echo "\n\n\n";
+        echo '====================================';
+        print_r($configFile['config']['componentToken']);
+        echo "\n\n\n";
 
         $client = new Client();
         $r = $client->put(
