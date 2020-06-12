@@ -82,11 +82,6 @@ class Extractor
     private function loadConfigFile(string $dataDir): array
     {
         $data = $this->loadJSONFile($dataDir, 'config.json');
-        $stateData = $this->loadAuthStateFile($dataDir);
-        if (count($stateData) > 0) {
-            $data = $stateData;
-            $this->logger->info(print_r($stateData));
-        }
         $processor = new Processor();
         try {
             $processor->processConfiguration(new ConfigFile(), $data);
@@ -106,6 +101,11 @@ class Extractor
     {
         try {
             $data = $this->loadJSONFile($dataDir, 'in'.DIRECTORY_SEPARATOR.'state.json');
+            $authStateData = $this->loadAuthStateFile($dataDir);
+            if (count($authStateData) > 0) {
+                $data = array_merge($data, $authStateData);
+                $this->logger->info(print_r($authStateData));
+            }
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
             $this->logger->warning("State file not found ".$e->getMessage());
