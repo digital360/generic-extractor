@@ -53,7 +53,6 @@ class Extractor
         $this->config = $this->loadConfigFile($dataDir);
         $this->state = $this->loadStateFile($dataDir);
         $this->dataDir = $dataDir;
-
     }
 
     /**
@@ -76,7 +75,6 @@ class Extractor
     }
 
 
-
     /**
      * @param  string  $dataDir
      * @return array
@@ -86,7 +84,6 @@ class Extractor
         $data = $this->loadJSONFile($dataDir, 'config.json');
         $stateData = $this->loadAuthStateFile($dataDir);
         if (count($stateData) > 0) {
-
             $data = $stateData;
             $this->logger->info(print_r($stateData));
         }
