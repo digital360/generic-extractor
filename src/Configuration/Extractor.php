@@ -54,7 +54,6 @@ class Extractor
         $this->state = $this->loadStateFile($dataDir);
         $this->dataDir = $dataDir;
 
-        $logger->info(print_r($this->state));
     }
 
     /**
@@ -87,7 +86,9 @@ class Extractor
         $data = $this->loadJSONFile($dataDir, 'config.json');
         $stateData = $this->loadAuthStateFile($dataDir);
         if (count($stateData) > 0) {
+
             $data = $stateData;
+            $this->logger->info(print_r($stateData));
         }
         $processor = new Processor();
         try {
