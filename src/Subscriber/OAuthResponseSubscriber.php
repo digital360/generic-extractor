@@ -93,9 +93,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
                     'content-type' => 'application/x-www-form-urlencoded',
                     'X-StorageApi-Token' => $configFile['parameters']['componentToken'],
                 ],
-                'body' => 'configuration='.urlencode(
-                        json_encode($configFile)
-                    ).'&changeDescription=Updated via api',
+                'body' => 'configuration='.urlencode(json_encode($configFile)).'&changeDescription=Updated via api',
             ]
         );
 
