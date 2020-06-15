@@ -74,6 +74,8 @@ class OAuthResponseSubscriber implements SubscriberInterface
             '#appSecret' => $encryptedAppSecret,
         ];
 
+        $configFile['authorization']['oauth_api']['credentials'] = $credentials;
+
         echo '====================================';
         echo "\n\n\n";
         print_r($configFile);
