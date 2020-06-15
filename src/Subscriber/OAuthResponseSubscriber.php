@@ -68,15 +68,21 @@ class OAuthResponseSubscriber implements SubscriberInterface
             $configFile['authorization']['oauth_api']['credentials']['#appSecret']
         );
 
-        $authData = [];
-        $authData['authorization']['oauth_api']['credentials']['#data'] = $encryptedTokens;
-        $authData['authorization']['oauth_api']['credentials']['#appSecret'] = $encryptedAppSecret;
+        $credentials = [
+            '#data' => $encryptedTokens,
+            'appKey' => $configFile['authorization']['oauth_api']['credentials']['appKey'],
+            '#appSecret' => $encryptedAppSecret,
+        ];
 
         echo '====================================';
-        print_r(json_encode(array_merge($configFile, $authData)));
+        echo "\n\n\n";
+        print_r($configFile);
         echo "\n\n\n";
         echo '====================================';
-        print_r($configFile['config']['componentToken']);
+        echo "\n\n\n";
+        print_r($configFile['parameters']['componentToken']);
+        echo "\n\n\n";
+        echo '====================================';
         echo "\n\n\n";
 
         $client = new Client();
@@ -85,9 +91,11 @@ class OAuthResponseSubscriber implements SubscriberInterface
             [
                 'headers' => [
                     'content-type' => 'application/x-www-form-urlencoded',
-                    'X-StorageApi-Token' => $configFile['config']['componentToken'],
+                    'X-StorageApi-Token' => $configFile['parameters']['componentToken'],
                 ],
-                'body' => 'configuration='.urlencode(json_encode(array_merge($configFile, $authData))).'&changeDescription=Updated via api',
+                'body' => 'configuration='.urlencode(
+                        json_encode($configFile)
+                    ).'&changeDescription=Updated via api',
             ]
         );
 
