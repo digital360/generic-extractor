@@ -91,19 +91,19 @@ class Extractor
         echo "\n\n\n";
         print_r(scandir('/data/out'));
         echo "\n\n\n";
-        $this->logger->debug(print_r(json_decode(file_get_contents('/data/out/creds.json'), true), true));
+        $this->logger->debug(print_r(json_decode(file_get_contents('/data/in/state.json'), true), true));
 
         $data = $this->loadJSONFile($dataDir, 'config.json');
 
         // merge creds file
         #######################################3
         // load creds to state.json
-        $credsFileName = $dataDir.DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'creds.json';
+        $credsFileName = $dataDir.DIRECTORY_SEPARATOR.'in'.DIRECTORY_SEPARATOR.'state.json';
         if (file_exists($credsFileName)) {
             $credsData = json_decode(file_get_contents($credsFileName), true);
             if (json_last_error() === JSON_ERROR_NONE) {
                 if (count($credsData) > 0) {
-                    $data['authorization']['oauth_api'] = $credsData;
+                    $data['authorization']['oauth_api'] = $credsData['custom'];
                     print_r($credsData);
                 }
             }
@@ -118,15 +118,6 @@ class Extractor
             // TODO: create issue to make this strict
             //$this->logger->warning("Configuration file configuration is invalid: " . $e->getMessage());
         }
-
-//        $data['authorization']['oauth_api'] = [
-//            'credentials' => [
-//                '#data' => '{"access_token": "abc", "refresh_token": "234567"}',
-//                'appKey' => 'fake key',
-//                '#appSecret' => 'fake secret',
-//            ],
-//        ];
-
 
         $this->logger->debug(print_r($data, true));
 

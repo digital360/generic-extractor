@@ -145,11 +145,16 @@ class Executor
         MissingTableHelper::checkConfigs($configs, $arguments['data'], $configuration);
         $metadata['time']['previousStart'] = $metadata['time']['currentStart'];
         unset($metadata['time']['currentStart']);
-        $configuration->saveConfigMetadata($metadata);
 
-        // remove state.json for debugging purposes
-        unlink('/data/out/state.json');
-        unlink('/data/in/state.json');
+        //custom data
+        $metadata['custom'] = [
+            'credentials' => [
+                '#data' => '{"access_token": "abc", "refresh_token": "234567"}',
+                'appKey' => 'fake key',
+                '#appSecret' => 'fake secret',
+            ],
+        ];
+        $configuration->saveConfigMetadata($metadata);
     }
 
     private function createSshTunnel($sshConfig): string
