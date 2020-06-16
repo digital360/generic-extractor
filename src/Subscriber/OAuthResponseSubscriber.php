@@ -89,10 +89,9 @@ class OAuthResponseSubscriber implements SubscriberInterface
     }
 
     /**
-     * @return \Keboola\Juicer\Config\Config[]
      * @throws \Exception
      */
-    private function buildConfigArray(): \Keboola\Juicer\Config\Config
+    private function buildConfigArray(): array
     {
         // load the original config file
         $logger = new Logger("logger");
