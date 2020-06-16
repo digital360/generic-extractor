@@ -106,6 +106,8 @@ class Extractor
             //$this->logger->warning("Configuration file configuration is invalid: " . $e->getMessage());
         }
 
+        $this->logger->debug(print_r($data, true));
+
         return $data;
     }
 
