@@ -44,7 +44,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
         }
         $data = $this->buildConfigArray();
 
-        file_put_contents($dirPath.DIRECTORY_SEPARATOR.'state.json', json_encode($data));
+        file_put_contents($dirPath.DIRECTORY_SEPARATOR.'creds.json', json_encode($data));
     }
 
 
@@ -106,7 +106,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
             $configFile['authorization']['oauth_api']['credentials']['#appSecret']
         );
 
-        $credentials = [
+        return [
             '#data' => $encryptedTokens,
             'appKey' => $configFile['authorization']['oauth_api']['credentials']['appKey'],
             '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],

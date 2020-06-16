@@ -3,6 +3,7 @@
 namespace Keboola\GenericExtractor;
 
 use Keboola\GenericExtractor\Configuration\Extractor;
+use Keboola\GenericExtractor\Exception\ApplicationException;
 use Keboola\GenericExtractor\Exception\UserException;
 use Keboola\Juicer\Config\Config;
 use Keboola\Juicer\Parser\Json;
@@ -26,7 +27,7 @@ class Executor
 
     /**
      * Executor constructor.
-     * @param Logger $logger
+     * @param  Logger  $logger
      */
     public function __construct(Logger $logger)
     {
@@ -34,7 +35,7 @@ class Executor
     }
 
     /**
-     * @param bool $debug
+     * @param  bool  $debug
      */
     private function setLogLevel($debug)
     {
@@ -82,7 +83,7 @@ class Executor
             if (!empty($config->getAttribute('outputBucket'))) {
                 $outputBucket = $config->getAttribute('outputBucket');
             } elseif ($config->getAttribute('id')) {
-                $outputBucket = 'ex-api-' . $api->getName() . "-" . $config->getAttribute('id');
+                $outputBucket = 'ex-api-'.$api->getName()."-".$config->getAttribute('id');
             } else {
                 $outputBucket = "__kbc_default";
             }
@@ -125,7 +126,7 @@ class Executor
             // move files and flatten file structure
             $folderFinder = new Finder();
             $fs = new Filesystem();
-            $folders = $folderFinder->directories()->in($arguments['data'] . "/out/tables")->depth(0);
+            $folders = $folderFinder->directories()->in($arguments['data']."/out/tables")->depth(0);
             foreach ($folders as $folder) {
                 /** @var SplFileInfo $folder */
                 $filesFinder = new Finder();
@@ -133,8 +134,8 @@ class Executor
                 /** @var SplFileInfo $file */
                 foreach ($files as $file) {
                     $destination =
-                        $arguments['data'] . "/out/tables/" . basename($folder->getPathname()) .
-                        "." . basename($file->getPathname());
+                        $arguments['data']."/out/tables/".basename($folder->getPathname()).
+                        ".".basename($file->getPathname());
                     // maybe move will be better?
                     $fs->rename($file->getPathname(), $destination);
                 }
@@ -146,9 +147,27 @@ class Executor
         $metadata['time']['previousStart'] = $metadata['time']['currentStart'];
         unset($metadata['time']['currentStart']);
         $configuration->saveConfigMetadata($metadata);
+
+
+        // load creds to state.json
+        $credsFileName = $arguments['data'].DIRECTORY_SEPARATOR.'creds.json';
+        if (!file_exists($credsFileName)) {
+            throw new ApplicationException("Configuration file '$credsFileName' not found.");
+        }
+        $credsData = json_decode(file_get_contents($credsFileName), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new ApplicationException("Creds file is not a valid JSON: ".json_last_error_msg());
+        }
+
+        // load state file
+        $stateFileData = $this->loadStateFile($arguments['data']);
+
+        $stateFileData['configuration']['authorization']['oauth_api']['credentials'] = $credsData;
+
+        $configuration->saveConfigMetadata($stateFileData);
     }
 
-    private function createSshTunnel($sshConfig) : string
+    private function createSshTunnel($sshConfig): string
     {
         $tunnelParams = [
             'user' => $sshConfig['user'],
@@ -157,8 +176,9 @@ class Executor
             'localPort' => 33006,
             'privateKey' => $sshConfig['#privateKey'],
         ];
-        $this->logger->info("Creating SSH tunnel to '" . $tunnelParams['sshHost'] . "'");
+        $this->logger->info("Creating SSH tunnel to '".$tunnelParams['sshHost']."'");
         (new SSH())->openTunnel($tunnelParams);
+
         return sprintf('socks5h://127.0.0.1:%s', $tunnelParams['localPort']);
     }
 }
