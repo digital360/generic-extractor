@@ -31,7 +31,6 @@ class OAuthResponseSubscriber implements SubscriberInterface
         if (isset($responseArr['refresh_token'])) {
             $this->_response_token = $jsonResponse;
             $this->saveCredsfile();
-            $this->list_data_dir();
         }
     }
 

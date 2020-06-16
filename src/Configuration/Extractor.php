@@ -91,7 +91,6 @@ class Extractor
             //$this->logger->warning("Configuration file configuration is invalid: " . $e->getMessage());
         }
 
-        return $data;
 
         // merge new creds
         #######################################3
@@ -110,7 +109,7 @@ class Extractor
         $this->logger->debug(print_r($data, true));
         #################################################3
 
-
+        return $data;
     }
 
     /**
