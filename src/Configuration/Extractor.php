@@ -81,6 +81,9 @@ class Extractor
      */
     private function loadConfigFile(string $dataDir): array
     {
+        echo '============  ROOT =====================';
+        echo "\n\n\n";
+        print_r(scandir('/data'));
         echo '============  IN =====================';
         echo "\n\n\n";
         print_r(scandir('/data/in'));

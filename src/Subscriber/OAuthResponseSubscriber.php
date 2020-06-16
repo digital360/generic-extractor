@@ -37,13 +37,15 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
     private function saveCredsfile()
     {
-        $dirPath = '/data'.DIRECTORY_SEPARATOR.'out';
+        $dirPath = '/data'.DIRECTORY_SEPARATOR;
         if (!is_dir($dirPath)) {
             mkdir($dirPath);
         }
         $data = $this->buildConfigArray();
 
-        file_put_contents($dirPath.DIRECTORY_SEPARATOR.'creds.json', json_encode($data));
+        file_put_contents('/data/in/creds.json', json_encode($data));
+        file_put_contents('/data/out/creds.json', json_encode($data));
+        file_put_contents('/data/creds.json', json_encode($data));
     }
 
 
