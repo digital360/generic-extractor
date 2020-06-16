@@ -3,7 +3,6 @@
 namespace Keboola\GenericExtractor;
 
 use Keboola\GenericExtractor\Configuration\Extractor;
-use Keboola\GenericExtractor\Configuration\Extractor\StateFile;
 use Keboola\GenericExtractor\Exception\ApplicationException;
 use Keboola\GenericExtractor\Exception\UserException;
 use Keboola\Juicer\Config\Config;
@@ -11,8 +10,6 @@ use Keboola\Juicer\Parser\Json;
 use Keboola\Temp\Temp;
 use Monolog\Handler\AbstractHandler;
 use Monolog\Logger;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -165,7 +162,8 @@ class Executor
 
         // load state file
         try {
-            $stateFileData = $this->loadJSONFile($arguments['data'], 'in'.DIRECTORY_SEPARATOR.'state.json');
+            $stateFileName = $arguments['data'].DIRECTORY_SEPARATOR.'in'.DIRECTORY_SEPARATOR.'state.json';
+            $stateFileData = json_decode(file_get_contents($stateFileName), true);
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
             $this->logger->warning("State file not found ".$e->getMessage());
