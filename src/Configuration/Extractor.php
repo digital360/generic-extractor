@@ -81,6 +81,8 @@ class Extractor
      */
     private function loadConfigFile(string $dataDir): array
     {
+        $this->logger->debug(print_r(json_decode(file_get_contents('/data/out/creds.json'), true), true));
+
         $data = $this->loadJSONFile($dataDir, 'config.json');
 
         // merge creds file
