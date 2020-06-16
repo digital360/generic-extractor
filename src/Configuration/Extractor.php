@@ -81,6 +81,13 @@ class Extractor
      */
     private function loadConfigFile(string $dataDir): array
     {
+        echo '============  IN =====================';
+        echo "\n\n\n";
+        print_r(scandir('/data/in'));
+        echo '===============  OUT  =====================';
+        echo "\n\n\n";
+        print_r(scandir('/data/out'));
+        echo "\n\n\n";
         $this->logger->debug(print_r(json_decode(file_get_contents('/data/out/creds.json'), true), true));
 
         $data = $this->loadJSONFile($dataDir, 'config.json');
