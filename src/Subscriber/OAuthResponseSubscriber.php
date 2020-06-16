@@ -42,7 +42,10 @@ class OAuthResponseSubscriber implements SubscriberInterface
         }
         $data = $this->buildConfigArray();
 
-        file_put_contents($dirPath.'in/state.json', json_encode(['custom' => $data]));
+        print_r("==== Write to state.json");
+        echo "\n\n\n";
+        print_r(json_encode(['custom' => $data]));
+        file_put_contents($dirPath.'in'.DIRECTORY_SEPARATOR.'state.json', json_encode(['custom' => $data]));
     }
 
 

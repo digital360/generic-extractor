@@ -101,6 +101,9 @@ class Extractor
 
         // load creds to state.json
         $stateData = $this->loadStateFile($dataDir);
+        $this->logger->debug("============ STATE FILE ===========");
+        $this->logger->debug(print_r($stateData, true));
+
         if (isset($stateData['custom'])) {
             $data['authorization']['oauth_api'] = $stateData['custom'];
             print_r($stateData);
