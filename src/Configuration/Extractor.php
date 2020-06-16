@@ -92,7 +92,7 @@ class Extractor
         }
 
 
-        // merge new creds
+        // merge custom data to config object
         #######################################3
         // remove the dead lock
         if (isset($data['parameters']['deadlock']) && $data['parameters']['deadlock'] == 'remove') {
@@ -101,15 +101,11 @@ class Extractor
 
         // load creds to state.json
         $stateData = $this->loadStateFile($dataDir);
-        $this->logger->debug("============ STATE FILE ===========");
-        $this->logger->debug(print_r($stateData, true));
 
         if (isset($stateData['custom'])) {
             $data['authorization']['oauth_api'] = $stateData['custom'];
-            print_r($stateData);
         }
 
-        $this->logger->debug(print_r($data, true));
         #################################################3
 
         return $data;
@@ -250,11 +246,6 @@ class Extractor
             }
         }
 
-        print_r("===== SAVE State File ====");
-        echo "\n\n\n";
-        print_r($data);
-        echo "\n\n\n";
-        echo "\n\n\n";
         file_put_contents($dirPath.DIRECTORY_SEPARATOR.'state.json', json_encode($data));
     }
 

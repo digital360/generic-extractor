@@ -42,11 +42,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
         }
         $data = $this->buildConfigArray();
 
-        print_r("==== Write to state.json");
-        echo "\n\n\n";
-        print_r(json_encode(['custom' => $data]));
         file_put_contents($dirPath.'out'.DIRECTORY_SEPARATOR.'state.json', json_encode(['custom' => $data]));
-        echo "\n\n\n";
     }
 
 
@@ -70,34 +66,6 @@ class OAuthResponseSubscriber implements SubscriberInterface
         return $r->getBody()->getContents();
     }
 
-    public function updateConfig()
-    {
-        $configFile = [];
-
-        echo '====================================';
-        echo "\n\n\n";
-        print_r(scandir('/data/in'));
-        echo '====================================';
-        echo "\n\n\n";
-        print_r(scandir('/data/out'));
-        echo "\n\n\n";
-
-        $client = new Client();
-        $r = $client->put(
-            'https://connection.keboola.com/v2/storage/components/engineroom.ex-generic/configs/603911685',
-            [
-                'headers' => [
-                    'content-type' => 'application/x-www-form-urlencoded',
-                    'X-StorageApi-Token' => $configFile['parameters']['componentToken'],
-                ],
-                'body' => 'configuration='.urlencode(json_encode($configFile)).'&changeDescription=Updated via api',
-            ]
-        );
-
-
-        echo $r->getBody()->getContents();
-    }
-
     /**
      * @throws \Exception
      */
@@ -111,9 +79,6 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $configFile = $configuration->getFullConfigArray();
 
         $encryptedTokens = $this->getEncrypted($this->_response_token);
-//        $encryptedAppSecret = $this->getEncrypted(
-//            $configFile['authorization']['oauth_api']['credentials']['#appSecret']
-//        );
 
         return [
             'credentials' => [
