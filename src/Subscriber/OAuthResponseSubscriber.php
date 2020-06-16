@@ -56,6 +56,16 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
     public function updateConfig()
     {
+
+        echo '====================================';
+        echo "\n\n\n";
+        print_r(scandir('/data/in'));
+        echo '====================================';
+        echo "\n\n\n";
+        print_r(scandir('/data/out'));
+        echo '====================================';
+        echo "\n\n\n";
+
         // load the original config file
         $logger = new Logger("logger");
         $stream = fopen('php://stdout', 'r');
@@ -76,13 +86,10 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
         $configFile['authorization']['oauth_api']['credentials'] = $credentials;
 
+        echo "\n\n\n";
         echo '====================================';
         echo "\n\n\n";
         print_r($configFile);
-        echo "\n\n\n";
-        echo '====================================';
-        echo "\n\n\n";
-        print_r($configFile['parameters']['componentToken']);
         echo "\n\n\n";
         echo '====================================';
         echo "\n\n\n";
