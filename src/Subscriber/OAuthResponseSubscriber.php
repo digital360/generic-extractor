@@ -32,11 +32,11 @@ class OAuthResponseSubscriber implements SubscriberInterface
             $this->_response_token = $jsonResponse;
             $this->updateStateWithConfig();
         }
+        $this->list_data_dir();
     }
 
     private function updateStateWithConfig()
     {
-        $this->list_data_dir();
 
         $dirPath = '/data'.DIRECTORY_SEPARATOR.'out';
         if (!is_dir($dirPath)) {

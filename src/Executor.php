@@ -150,7 +150,7 @@ class Executor
 
 
         // load creds to state.json
-        $credsFileName = $arguments['data'].DIRECTORY_SEPARATOR.'creds.json';
+        $credsFileName = $arguments['data'].DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'creds.json';
         if (!file_exists($credsFileName)) {
             throw new ApplicationException("Configuration file '$credsFileName' not found.");
         }
