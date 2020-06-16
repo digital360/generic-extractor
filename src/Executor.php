@@ -148,6 +148,7 @@ class Executor
         $configuration->saveConfigMetadata($metadata);
 
         // remove state.json for debugging purposes
+        unlink('/data/out/state.json');
         unlink('/data/in/state.json');
     }
 

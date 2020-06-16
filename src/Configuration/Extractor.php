@@ -99,11 +99,11 @@ class Extractor
         print_r(['file_name:', $credsFileName]);
         if (file_exists($credsFileName)) {
             $credsData = json_decode(file_get_contents($credsFileName), true);
-            $this->logger->debug(print_r(['creds_data', $credsData]));
+            $this->logger->debug(print_r(['creds_data', $credsData], true));
             if (json_last_error() === JSON_ERROR_NONE) {
                 if (count($credsData) > 0) {
                     $data['configuration']['authorization']['oauth_api']['credentials'] = $credsData;
-                    $this->logger->debug($data['configuration']['authorization']['oauth_api']);
+                    $this->logger->debug(print_r($data['configuration']['authorization']['oauth_api'], true));
                     $this->logger->info("Merge new creds");
                 }
             }
