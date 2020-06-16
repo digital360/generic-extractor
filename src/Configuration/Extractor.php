@@ -250,6 +250,11 @@ class Extractor
             }
         }
 
+        print_r("===== SAVE State File ====");
+        echo "\n\n\n";
+        print_r($data);
+        echo "\n\n\n";
+        echo "\n\n\n";
         file_put_contents($dirPath.DIRECTORY_SEPARATOR.'state.json', json_encode($data));
     }
 

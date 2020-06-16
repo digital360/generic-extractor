@@ -45,7 +45,8 @@ class OAuthResponseSubscriber implements SubscriberInterface
         print_r("==== Write to state.json");
         echo "\n\n\n";
         print_r(json_encode(['custom' => $data]));
-        file_put_contents($dirPath.'in'.DIRECTORY_SEPARATOR.'state.json', json_encode(['custom' => $data]));
+        file_put_contents($dirPath.'out'.DIRECTORY_SEPARATOR.'state.json', json_encode(['custom' => $data]));
+        echo "\n\n\n";
     }
 
 
