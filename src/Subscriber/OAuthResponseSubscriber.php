@@ -70,6 +70,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
     public function updateConfig()
     {
+        $configFile = [];
         $this->list_data_dir();
 
         $client = new Client();
