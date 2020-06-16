@@ -82,15 +82,6 @@ class Extractor
     private function loadConfigFile(string $dataDir): array
     {
         $data = $this->loadJSONFile($dataDir, 'config.json');
-        $this->logger->debug($data['configuration']['authorization']['oauth_api']);
-
-        $processor = new Processor();
-        try {
-            $processor->processConfiguration(new ConfigFile(), $data);
-        } catch (InvalidConfigurationException $e) {
-            // TODO: create issue to make this strict
-            //$this->logger->warning("Configuration file configuration is invalid: " . $e->getMessage());
-        }
 
         // merge creds file
         #######################################3
@@ -110,6 +101,16 @@ class Extractor
         }
 
         #################################################3
+
+        $processor = new Processor();
+        try {
+            $processor->processConfiguration(new ConfigFile(), $data);
+        } catch (InvalidConfigurationException $e) {
+            // TODO: create issue to make this strict
+            //$this->logger->warning("Configuration file configuration is invalid: " . $e->getMessage());
+        }
+
+
 
         return $data;
     }

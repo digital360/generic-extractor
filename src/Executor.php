@@ -60,6 +60,8 @@ class Executor
         }
 
         $configuration = new Extractor($arguments['data'], $this->logger);
+        $this->logger->info('what do we have here');
+        $this->logger->info(print_r($configuration, true));
         $configs = $configuration->getMultipleConfigs();
 
         $sshProxy = null;
