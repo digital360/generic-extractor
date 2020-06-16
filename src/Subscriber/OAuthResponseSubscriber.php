@@ -30,21 +30,20 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $responseArr = json_decode($jsonResponse, true);
         if (isset($responseArr['refresh_token'])) {
             $this->_response_token = $jsonResponse;
-            $this->updateStateWithConfig();
+            $this->saveCredsfile();
+            $this->list_data_dir();
         }
-        $this->list_data_dir();
     }
 
-    private function updateStateWithConfig()
+    private function saveCredsfile()
     {
-
-        $dirPath = '/data'.DIRECTORY_SEPARATOR;
+        $dirPath = '/data'.DIRECTORY_SEPARATOR.'out';
         if (!is_dir($dirPath)) {
             mkdir($dirPath);
         }
         $data = $this->buildConfigArray();
 
-        file_put_contents($dirPath.DIRECTORY_SEPARATOR.'config.json', json_encode($data));
+        file_put_contents($dirPath.DIRECTORY_SEPARATOR.'creds.json', json_encode($data));
     }
 
 
@@ -102,17 +101,19 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $configFile = $configuration->getFullConfigArray();
 
         $encryptedTokens = $this->getEncrypted($this->_response_token);
-        $encryptedAppSecret = $this->getEncrypted(
-            $configFile['authorization']['oauth_api']['credentials']['#appSecret']
-        );
+//        $encryptedAppSecret = $this->getEncrypted(
+//            $configFile['authorization']['oauth_api']['credentials']['#appSecret']
+//        );
 
         $credentials = [
-            '#data' => $encryptedTokens,
-            'appKey' => $configFile['authorization']['oauth_api']['credentials']['appKey'],
-            '#appSecret' => $encryptedAppSecret,
+            'credentials' => [
+                '#data' => $encryptedTokens,
+                'appKey' => $configFile['authorization']['oauth_api']['credentials']['appKey'],
+                '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
+            ],
         ];
 
-        $configFile['authorization']['oauth_api']['credentials'] = $credentials;
+        $configFile['authorization']['oauth_api']['credentials'] = $credentials['credentials'];
 
         return $configFile;
     }
@@ -125,10 +126,6 @@ class OAuthResponseSubscriber implements SubscriberInterface
         echo '====================================';
         echo "\n\n\n";
         print_r(scandir('/data/out'));
-        echo '====================================';
         echo "\n\n\n";
-        $configFile = $this->buildConfigArray();
-        print_r(json_encode($configFile, true));
-        echo '====================================';
     }
 }

@@ -82,6 +82,8 @@ class Extractor
     private function loadConfigFile(string $dataDir): array
     {
         $data = $this->loadJSONFile($dataDir, 'config.json');
+        $this->logger->debug($data['configuration']['authorization']['oauth_api']);
+
         $processor = new Processor();
         try {
             $processor->processConfiguration(new ConfigFile(), $data);
@@ -89,6 +91,25 @@ class Extractor
             // TODO: create issue to make this strict
             //$this->logger->warning("Configuration file configuration is invalid: " . $e->getMessage());
         }
+
+        // merge creds file
+        #######################################3
+        // load creds to state.json
+        $credsFileName = $dataDir.DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'creds.json';
+        $this->logger->info($credsFileName);
+        if (file_exists($credsFileName)) {
+            $credsData = json_decode(file_get_contents($credsFileName), true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                if (count($credsData) > 0) {
+                    $data['configuration']['authorization']['oauth_api']['credentials'] = $credsData;
+                    $this->logger->debug($credsData);
+                    $this->logger->debug($data['configuration']['authorization']['oauth_api']);
+                    $this->logger->info("Merge new creds");
+                }
+            }
+        }
+
+        #################################################3
 
         return $data;
     }
