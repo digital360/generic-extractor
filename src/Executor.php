@@ -3,7 +3,6 @@
 namespace Keboola\GenericExtractor;
 
 use Keboola\GenericExtractor\Configuration\Extractor;
-use Keboola\GenericExtractor\Exception\ApplicationException;
 use Keboola\GenericExtractor\Exception\UserException;
 use Keboola\Juicer\Config\Config;
 use Keboola\Juicer\Parser\Json;
@@ -147,6 +146,9 @@ class Executor
         $metadata['time']['previousStart'] = $metadata['time']['currentStart'];
         unset($metadata['time']['currentStart']);
         $configuration->saveConfigMetadata($metadata);
+
+        // remove state.json for debugging purposes
+        unlink('/data/in/state.json');
     }
 
     private function createSshTunnel($sshConfig): string
