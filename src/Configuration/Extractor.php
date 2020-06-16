@@ -99,7 +99,7 @@ class Extractor
         print_r(['file_name:', $credsFileName]);
         if (file_exists($credsFileName)) {
             $credsData = json_decode(file_get_contents($credsFileName), true);
-            print_r(['creds_data', $credsData]);
+            $this->logger->debug(print_r(['creds_data', $credsData]));
             if (json_last_error() === JSON_ERROR_NONE) {
                 if (count($credsData) > 0) {
                     $data['configuration']['authorization']['oauth_api']['credentials'] = $credsData;
@@ -108,8 +108,6 @@ class Extractor
                 }
             }
         }
-
-        print_r('line 112. end of if');
 
         #################################################3
 

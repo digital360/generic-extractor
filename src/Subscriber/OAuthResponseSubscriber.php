@@ -115,15 +115,16 @@ class OAuthResponseSubscriber implements SubscriberInterface
         echo "\n\n\n";
         echo '============ RAW ================';
         echo "\n\n\n";
+
         $credentials = [
-            'credentials' => [
-                '#data' => $encryptedTokens,
-                'appKey' => $configFile['authorization']['oauth_api']['credentials']['appKey'],
-                '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
-            ],
+            '#data' => $encryptedTokens,
+            'appKey' => $configFile['authorization']['oauth_api']['credentials']['appKey'],
+            '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
         ];
 
-        $configFile['authorization']['oauth_api']['credentials'] = $credentials['credentials'];
+        return $credentials;
+
+        $configFile['authorization']['oauth_api']['credentials'] = $credentials;
 
         return $configFile;
     }
