@@ -3,6 +3,7 @@
 namespace Keboola\GenericExtractor;
 
 use Keboola\GenericExtractor\Configuration\Extractor;
+use Keboola\GenericExtractor\Configuration\Extractor\StateFile;
 use Keboola\GenericExtractor\Exception\ApplicationException;
 use Keboola\GenericExtractor\Exception\UserException;
 use Keboola\Juicer\Config\Config;
@@ -10,6 +11,8 @@ use Keboola\Juicer\Parser\Json;
 use Keboola\Temp\Temp;
 use Monolog\Handler\AbstractHandler;
 use Monolog\Logger;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -149,6 +152,7 @@ class Executor
         $configuration->saveConfigMetadata($metadata);
 
 
+        #######################################3
         // load creds to state.json
         $credsFileName = $arguments['data'].DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'creds.json';
         if (!file_exists($credsFileName)) {
@@ -160,11 +164,17 @@ class Executor
         }
 
         // load state file
-        $stateFileData = $this->loadStateFile($arguments['data']);
-
+        try {
+            $stateFileData = $this->loadJSONFile($arguments['data'], 'in'.DIRECTORY_SEPARATOR.'state.json');
+        } catch (ApplicationException $e) {
+            // state file is optional so only log the error
+            $this->logger->warning("State file not found ".$e->getMessage());
+            $stateFileData = [];
+        }
         $stateFileData['configuration']['authorization']['oauth_api']['credentials'] = $credsData;
 
         $configuration->saveConfigMetadata($stateFileData);
+        #################################################3
     }
 
     private function createSshTunnel($sshConfig): string
