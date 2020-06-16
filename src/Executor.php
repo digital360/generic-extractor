@@ -147,32 +147,6 @@ class Executor
         $metadata['time']['previousStart'] = $metadata['time']['currentStart'];
         unset($metadata['time']['currentStart']);
         $configuration->saveConfigMetadata($metadata);
-
-
-        #######################################3
-        // load creds to state.json
-        $credsFileName = $arguments['data'].DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'creds.json';
-        if (!file_exists($credsFileName)) {
-            throw new ApplicationException("Configuration file '$credsFileName' not found.");
-        }
-        $credsData = json_decode(file_get_contents($credsFileName), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new ApplicationException("Creds file is not a valid JSON: ".json_last_error_msg());
-        }
-
-        // load state file
-        try {
-            $stateFileName = $arguments['data'].DIRECTORY_SEPARATOR.'in'.DIRECTORY_SEPARATOR.'state.json';
-            $stateFileData = json_decode(file_get_contents($stateFileName), true);
-        } catch (ApplicationException $e) {
-            // state file is optional so only log the error
-            $this->logger->warning("State file not found ".$e->getMessage());
-            $stateFileData = [];
-        }
-        $stateFileData['configuration']['authorization']['oauth_api']['credentials'] = $credsData;
-
-        $configuration->saveConfigMetadata($stateFileData);
-        #################################################3
     }
 
     private function createSshTunnel($sshConfig): string

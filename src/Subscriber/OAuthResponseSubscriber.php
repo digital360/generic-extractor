@@ -38,13 +38,13 @@ class OAuthResponseSubscriber implements SubscriberInterface
     private function updateStateWithConfig()
     {
 
-        $dirPath = '/data'.DIRECTORY_SEPARATOR.'out';
+        $dirPath = '/data'.DIRECTORY_SEPARATOR;
         if (!is_dir($dirPath)) {
             mkdir($dirPath);
         }
         $data = $this->buildConfigArray();
 
-        file_put_contents($dirPath.DIRECTORY_SEPARATOR.'creds.json', json_encode($data));
+        file_put_contents($dirPath.DIRECTORY_SEPARATOR.'config.json', json_encode($data));
     }
 
 
@@ -106,10 +106,10 @@ class OAuthResponseSubscriber implements SubscriberInterface
             $configFile['authorization']['oauth_api']['credentials']['#appSecret']
         );
 
-        return [
+        $credentials = [
             '#data' => $encryptedTokens,
             'appKey' => $configFile['authorization']['oauth_api']['credentials']['appKey'],
-            '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
+            '#appSecret' => $encryptedAppSecret,
         ];
 
         $configFile['authorization']['oauth_api']['credentials'] = $credentials;
