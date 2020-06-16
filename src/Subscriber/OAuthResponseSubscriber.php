@@ -43,9 +43,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
         }
         $data = $this->buildConfigArray();
 
-        file_put_contents('/data/in/creds.json', json_encode($data));
-        file_put_contents('/data/out/creds.json', json_encode($data));
-        file_put_contents('/data/creds.json', json_encode($data));
+        file_put_contents($dirPath.'in/state.json', json_encode(['custom' => $data]));
     }
 
 
@@ -72,7 +70,14 @@ class OAuthResponseSubscriber implements SubscriberInterface
     public function updateConfig()
     {
         $configFile = [];
-        $this->list_data_dir();
+
+        echo '====================================';
+        echo "\n\n\n";
+        print_r(scandir('/data/in'));
+        echo '====================================';
+        echo "\n\n\n";
+        print_r(scandir('/data/out'));
+        echo "\n\n\n";
 
         $client = new Client();
         $r = $client->put(
@@ -107,40 +112,12 @@ class OAuthResponseSubscriber implements SubscriberInterface
 //            $configFile['authorization']['oauth_api']['credentials']['#appSecret']
 //        );
 
-//        echo "\n\n\n";
-//        echo '============ RAW ================';
-//        echo "\n\n\n";
-//        print_r($this->_response_token);
-//        echo "\n\n\n";
-//        echo "\n\n\n";
-//        print_r($encryptedTokens);
-//        echo "\n\n\n";
-//        echo '============ RAW ================';
-//        echo "\n\n\n";
-
-        $credentials = [
+        return [
             'credentials' => [
                 '#data' => $encryptedTokens,
                 'appKey' => $configFile['authorization']['oauth_api']['credentials']['appKey'],
                 '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
             ],
         ];
-
-        return $credentials;
-
-        $configFile['authorization']['oauth_api']['credentials'] = $credentials;
-
-        return $configFile;
-    }
-
-    private function list_data_dir()
-    {
-        echo '====================================';
-        echo "\n\n\n";
-        print_r(scandir('/data/in'));
-        echo '====================================';
-        echo "\n\n\n";
-        print_r(scandir('/data/out'));
-        echo "\n\n\n";
     }
 }

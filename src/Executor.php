@@ -146,14 +146,6 @@ class Executor
         $metadata['time']['previousStart'] = $metadata['time']['currentStart'];
         unset($metadata['time']['currentStart']);
 
-        //custom data
-        $metadata['custom'] = [
-            'credentials' => [
-                '#data' => '{"access_token": "abc", "refresh_token": "234567"}',
-                'appKey' => 'fake key',
-                '#appSecret' => 'fake secret',
-            ],
-        ];
         $configuration->saveConfigMetadata($metadata);
     }
 

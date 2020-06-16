@@ -81,16 +81,6 @@ class Extractor
      */
     private function loadConfigFile(string $dataDir): array
     {
-        echo '============  ROOT =====================';
-        echo "\n\n\n";
-        print_r(scandir('/data'));
-        echo '============  IN =====================';
-        echo "\n\n\n";
-        print_r(scandir('/data/in'));
-        echo '===============  OUT  =====================';
-        echo "\n\n\n";
-        print_r(scandir('/data/out'));
-        echo "\n\n\n";
         $this->logger->debug(print_r(json_decode(file_get_contents('/data/in/state.json'), true), true));
 
         $data = $this->loadJSONFile($dataDir, 'config.json');
@@ -247,6 +237,18 @@ class Extractor
         if (!is_dir($dirPath)) {
             mkdir($dirPath);
         }
+
+        // pull custom data out of the file and merge back
+        $stateOutFile = $this->dataDir.DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'state.json';
+        if (file_exists($stateOutFile)) {
+            $customData = json_decode(file_get_contents($stateOutFile), true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                if (count($customData) > 0) {
+                    $data['custom'] = $customData['custom'];
+                }
+            }
+        }
+
         file_put_contents($dirPath.DIRECTORY_SEPARATOR.'state.json', json_encode($data));
     }
 
