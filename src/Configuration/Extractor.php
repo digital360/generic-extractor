@@ -81,26 +81,7 @@ class Extractor
      */
     private function loadConfigFile(string $dataDir): array
     {
-        $this->logger->debug(print_r(json_decode(file_get_contents('/data/in/state.json'), true), true));
-
         $data = $this->loadJSONFile($dataDir, 'config.json');
-
-        // remove the dead lock
-        if (isset($data['parameters']['deadlock']) && $data['parameters']['deadlock'] == 'remove') {
-            unlink('/data/in/state.json');
-        }
-
-        // merge new creds
-        #######################################3
-        // load creds to state.json
-        $stateFile = $dataDir.DIRECTORY_SEPARATOR.'in'.DIRECTORY_SEPARATOR.'state.json';
-        $stateData = $this->loadStateFile($dataDir);
-        if (isset($stateData['custom'])) {
-            $data['authorization']['oauth_api'] = $stateData['custom'];
-            print_r($stateData);
-        }
-
-        #################################################3
 
         $processor = new Processor();
         try {
@@ -110,9 +91,26 @@ class Extractor
             //$this->logger->warning("Configuration file configuration is invalid: " . $e->getMessage());
         }
 
-        $this->logger->debug(print_r($data, true));
-
         return $data;
+
+        // merge new creds
+        #######################################3
+        // remove the dead lock
+        if (isset($data['parameters']['deadlock']) && $data['parameters']['deadlock'] == 'remove') {
+            unlink('/data/in/state.json');
+        }
+
+        // load creds to state.json
+        $stateData = $this->loadStateFile($dataDir);
+        if (isset($stateData['custom'])) {
+            $data['authorization']['oauth_api'] = $stateData['custom'];
+            print_r($stateData);
+        }
+
+        $this->logger->debug(print_r($data, true));
+        #################################################3
+
+
     }
 
     /**
