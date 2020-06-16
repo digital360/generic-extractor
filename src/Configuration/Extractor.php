@@ -96,18 +96,20 @@ class Extractor
         #######################################3
         // load creds to state.json
         $credsFileName = $dataDir.DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'creds.json';
-        $this->logger->info($credsFileName);
+        print_r(['file_name:', $credsFileName]);
         if (file_exists($credsFileName)) {
             $credsData = json_decode(file_get_contents($credsFileName), true);
+            print_r(['creds_data', $credsData]);
             if (json_last_error() === JSON_ERROR_NONE) {
                 if (count($credsData) > 0) {
                     $data['configuration']['authorization']['oauth_api']['credentials'] = $credsData;
-                    $this->logger->debug($credsData);
                     $this->logger->debug($data['configuration']['authorization']['oauth_api']);
                     $this->logger->info("Merge new creds");
                 }
             }
         }
+
+        print_r('line 112. end of if');
 
         #################################################3
 
