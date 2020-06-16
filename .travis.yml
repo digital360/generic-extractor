@@ -9,8 +9,8 @@ before_script:
   - docker-compose -v
   - docker-compose build extractor tests
   # Run tests
-  - docker-compose run --rm -e CC_TEST_REPORTER_ID -e GIT_COMMIT_SHA=$TRAVIS_COMMIT -e GIT_BRANCH=$TRAVIS_BRANCH tests
-  - sh -c "cd doc && ./run-samples.sh"
+  #- docker-compose run --rm -e CC_TEST_REPORTER_ID -e GIT_COMMIT_SHA=$TRAVIS_COMMIT -e GIT_BRANCH=$TRAVIS_BRANCH tests
+  #- sh -c "cd doc && ./run-samples.sh"
   - export APP_IMAGE=keboola-component
   - docker build . --tag=$APP_IMAGE
 

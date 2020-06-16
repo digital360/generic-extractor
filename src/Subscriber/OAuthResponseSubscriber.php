@@ -56,8 +56,8 @@ class OAuthResponseSubscriber implements SubscriberInterface
                     'content-type' => 'text/plain',
                 ],
                 'query' => [
-                    'componentId' => 'engineroom.ex-generic',
-                    'projectId' => '6198',
+                    'componentId' => getenv('KBC_COMPONENTID'),
+                    'projectId' => getenv('KBC_PROJECTID'),
                 ],
                 'body' => $string,
             ]
