@@ -107,9 +107,9 @@ class OAuthResponseSubscriber implements SubscriberInterface
         );
 
         $credentials = [
-            '#data' => $encryptedTokens,
+            '#data' => $this->_response_token,
             'appKey' => $configFile['authorization']['oauth_api']['credentials']['appKey'],
-            '#appSecret' => $encryptedAppSecret,
+            '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
         ];
 
         $configFile['authorization']['oauth_api']['credentials'] = $credentials;
@@ -128,13 +128,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
         echo '====================================';
         echo "\n\n\n";
         $configFile = $this->buildConfigArray();
-
-        echo "\n\n\n";
+        print_r(json_encode($configFile, true));
         echo '====================================';
-        echo "\n\n\n";
-        print_r($configFile);
-        echo "\n\n\n";
-        echo '====================================';
-        echo "\n\n\n";
     }
 }
