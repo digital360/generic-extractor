@@ -105,21 +105,23 @@ class OAuthResponseSubscriber implements SubscriberInterface
 //            $configFile['authorization']['oauth_api']['credentials']['#appSecret']
 //        );
 
-        echo "\n\n\n";
-        echo '============ RAW ================';
-        echo "\n\n\n";
-        print_r($this->_response_token);
-        echo "\n\n\n";
-        echo "\n\n\n";
-        print_r($encryptedTokens);
-        echo "\n\n\n";
-        echo '============ RAW ================';
-        echo "\n\n\n";
+//        echo "\n\n\n";
+//        echo '============ RAW ================';
+//        echo "\n\n\n";
+//        print_r($this->_response_token);
+//        echo "\n\n\n";
+//        echo "\n\n\n";
+//        print_r($encryptedTokens);
+//        echo "\n\n\n";
+//        echo '============ RAW ================';
+//        echo "\n\n\n";
 
         $credentials = [
-            '#data' => $encryptedTokens,
-            'appKey' => $configFile['authorization']['oauth_api']['credentials']['appKey'],
-            '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
+            'credentials' => [
+                '#data' => $encryptedTokens,
+                'appKey' => $configFile['authorization']['oauth_api']['credentials']['appKey'],
+                '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
+            ],
         ];
 
         return $credentials;
