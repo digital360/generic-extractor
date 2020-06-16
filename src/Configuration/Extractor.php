@@ -85,18 +85,19 @@ class Extractor
 
         $data = $this->loadJSONFile($dataDir, 'config.json');
 
-        // merge creds file
+        // remove the dead lock
+        if (isset($data['parameters']['deadlock']) && $data['parameters']['deadlock'] == 'remove') {
+            unlink('/data/in/state.json');
+        }
+
+        // merge new creds
         #######################################3
         // load creds to state.json
-        $credsFileName = $dataDir.DIRECTORY_SEPARATOR.'in'.DIRECTORY_SEPARATOR.'state.json';
-        if (file_exists($credsFileName)) {
-            $credsData = json_decode(file_get_contents($credsFileName), true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                if (count($credsData) > 0) {
-                    $data['authorization']['oauth_api'] = $credsData['custom'];
-                    print_r($credsData);
-                }
-            }
+        $stateFile = $dataDir.DIRECTORY_SEPARATOR.'in'.DIRECTORY_SEPARATOR.'state.json';
+        $stateData = $this->loadStateFile($dataDir);
+        if (isset($stateData['custom'])) {
+            $data['authorization']['oauth_api'] = $stateData['custom'];
+            print_r($stateData);
         }
 
         #################################################3
