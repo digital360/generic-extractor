@@ -107,7 +107,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
         );
 
         $credentials = [
-            '#data' => $this->_response_token,
+            '#data' => $encryptedTokens,
             'appKey' => $configFile['authorization']['oauth_api']['credentials']['appKey'],
             '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
         ];
