@@ -8,6 +8,9 @@ services:
       - .tmp:/tmp
       - .:/code
       - ./data:/data
+    environment:
+      - KBC_COMPONENTID=engineroom.ex-generic
+      - KBC_PROJECTID=6198
     command:
       - /bin/sh
       - -c
@@ -22,7 +25,7 @@ services:
     volumes:
       - ./.git:/code/.git
       - .tmp:/tmp
-    command: 
+    command:
       - /code/phpunit.sh
     tty: true
     stdin_open: true
@@ -35,7 +38,7 @@ services:
       - .:/code
       - .tmp:/tmp
     command:
-      - /bin/sh 
+      - /bin/sh
       - -c
       - "composer install --no-interaction && /code/phpunit.sh"
     tty: true
