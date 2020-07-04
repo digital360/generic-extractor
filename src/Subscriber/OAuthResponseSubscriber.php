@@ -37,9 +37,6 @@ class OAuthResponseSubscriber implements SubscriberInterface
     private function saveCredsfile()
     {
         $dirPath = '/data'.DIRECTORY_SEPARATOR;
-        echo '<pre>';
-        print_r(scandir($dirPath));
-        echo "\n\n";
         if (!is_dir($dirPath)) {
             mkdir($dirPath);
         }
@@ -81,7 +78,11 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $configuration = new Extractor('/data', $logger);
         $configFile = $configuration->getFullConfigArray();
 
-        $encryptedTokens = $this->getEncrypted($this->_response_token);
+        if (getenv('APP_ENV') == 'dev') {
+            $encryptedTokens = $this->_response_token;
+        } else {
+            $encryptedTokens = $this->getEncrypted($this->_response_token);
+        }
 
         return [
             'credentials' => [

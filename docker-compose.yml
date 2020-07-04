@@ -9,6 +9,7 @@ services:
       - .:/code
       - ./data:/data
     environment:
+      - APP_ENV=dev
       - KBC_COMPONENTID=engineroom.ex-generic
       - KBC_PROJECTID=6198
     command:

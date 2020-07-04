@@ -102,7 +102,9 @@ class Extractor
         // load creds to state.json
         $stateOutFile = $dataDir.DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'state.json';
         if (file_exists($stateOutFile)) {
-            $stateData = $this->loadStateFile($dataDir,'out');
+            $stateData = $this->loadStateFile($dataDir, 'out');
+            echo '<pre>';
+            print_r($stateData['custom']);
         } else {
             $stateData = $this->loadStateFile($dataDir);
         }
