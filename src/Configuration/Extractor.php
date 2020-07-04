@@ -118,7 +118,14 @@ class Extractor
     private function loadStateFile(string $dataDir): array
     {
         try {
-            $data = $this->loadJSONFile($dataDir, 'in'.DIRECTORY_SEPARATOR.'state.json');
+            // if there is a state.json in out dir. pick that
+            // we expect keboola to move it into in dir on success.
+            $stateOutFile = $dataDir.DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'state.json';
+            if (file_exists($stateOutFile)) {
+                $data = $this->loadJSONFile($dataDir, 'out'.DIRECTORY_SEPARATOR.'state.json');
+            } else {
+                $data = $this->loadJSONFile($dataDir, 'in'.DIRECTORY_SEPARATOR.'state.json');
+            }
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
             $this->logger->warning("State file not found ".$e->getMessage());

@@ -37,6 +37,9 @@ class OAuthResponseSubscriber implements SubscriberInterface
     private function saveCredsfile()
     {
         $dirPath = '/data'.DIRECTORY_SEPARATOR;
+        echo '<pre>';
+        print_r(scandir($dirPath));
+        echo "\n\n";
         if (!is_dir($dirPath)) {
             mkdir($dirPath);
         }

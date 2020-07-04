@@ -22,13 +22,15 @@ function moveNewStateFile(\Monolog\Logger $logger)
 
     $dataDir = $arguments["data"];
 
+    echo "\n";
+    echo 'Look for the auth file inside the out dir';
+    echo "\n";
+
     // replace the state.json in /in/ dir
     // read the in/state.json
     $configuration = new Extractor($dataDir, $logger);
     echo "\n";
-    echo "\n";
     echo 'Save new auth file';
-    echo "\n";
     echo "\n";
     $configuration->saveConfigMetadata($configuration->getFullConfigArray());
 }
