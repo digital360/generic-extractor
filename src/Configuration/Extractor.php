@@ -100,7 +100,12 @@ class Extractor
         }
 
         // load creds to state.json
-        $stateData = $this->loadStateFile($dataDir);
+        $stateOutFile = $dataDir.DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'state.json';
+        if (file_exists($stateOutFile)) {
+            $stateData = $this->loadStateFile($dataDir,'out');
+        } else {
+            $stateData = $this->loadStateFile($dataDir);
+        }
 
         if (isset($stateData['custom'])) {
             $data['authorization']['oauth_api'] = $stateData['custom'];
@@ -113,19 +118,16 @@ class Extractor
 
     /**
      * @param  string  $dataDir
+     * @param  string  $folder
      * @return array
      */
-    private function loadStateFile(string $dataDir): array
+    private function loadStateFile(string $dataDir, $folder = 'in'): array
     {
         try {
-            // if there is a state.json in out dir. pick that
-            // we expect keboola to move it into in dir on success.
-            $stateOutFile = $dataDir.DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'state.json';
-            if (file_exists($stateOutFile)) {
-                $data = $this->loadJSONFile($dataDir, 'out'.DIRECTORY_SEPARATOR.'state.json');
-            } else {
-                $data = $this->loadJSONFile($dataDir, 'in'.DIRECTORY_SEPARATOR.'state.json');
-            }
+            echo "\n\n";
+            echo $dataDir.DIRECTORY_SEPARATOR.$folder.DIRECTORY_SEPARATOR.'state.json';
+            echo "\n\n";
+            $data = $this->loadJSONFile($dataDir, $folder.DIRECTORY_SEPARATOR.'state.json');
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
             $this->logger->warning("State file not found ".$e->getMessage());
