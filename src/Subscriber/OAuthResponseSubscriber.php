@@ -44,6 +44,9 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
         echo "\n";
         echo "Updating out/state.json file";
+        echo '###############';
+        echo $data;
+        echo '###############';
         echo "\n";
         file_put_contents($dirPath.'out'.DIRECTORY_SEPARATOR.'state.json', json_encode(['custom' => $data]));
     }
