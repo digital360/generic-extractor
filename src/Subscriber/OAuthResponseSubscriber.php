@@ -29,9 +29,15 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $jsonResponse = $event->getResponse()->getBody()->getContents();
         $responseArr = json_decode($jsonResponse, true);
         if (isset($responseArr['refresh_token'])) {
+            echo "INSIDE the refresh_token";
+            echo "\n";
+            echo $jsonResponse;
             $this->_response_token = $jsonResponse;
             $this->saveCredsfile();
         }
+
+        echo "\n";
+        echo "OUTSIDE the refresh_token";
     }
 
     private function saveCredsfile()

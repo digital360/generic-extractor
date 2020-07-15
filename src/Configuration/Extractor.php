@@ -141,6 +141,9 @@ class Extractor
             //$this->logger->warning("State file configuration is invalid: " . $e->getMessage());
         }
 
+        echo 'STATE FILE';
+        echo "\n";
+        echo json_encode($data);
         return $data;
     }
 
