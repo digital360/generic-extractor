@@ -64,9 +64,6 @@ class Extractor
     private function loadConfigFile(string $dataDir): array
     {
         $data = $this->loadJSONFile($dataDir, 'config.json');
-        if (count($data) > 0) {
-            echo "Config Path: " . $dataDir;
-        }
 
         $processor = new Processor();
         try {
@@ -85,22 +82,17 @@ class Extractor
         }
 
         // load creds to state.json
-        $stateOutFile = '/data/out/state.json';
+        $stateOutFile = $dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'state.json';
         if (file_exists($stateOutFile)) {
-            echo "reading OUT state file";
             $stateData = $this->loadStateFile($dataDir, 'out');
+            echo '<pre>';
+            print_r($stateData['custom']);
         } else {
-            $stateInFile = '/data/in/state.json';
-            if (file_exists($stateInFile)) {
-                $stateData = $this->loadStateFile($dataDir, 'in');
-                echo "reading IN state file";
-            } else {
-                $stateData = [];
-            }
+            $stateData = $this->loadStateFile($dataDir);
         }
 
-        if (isset($stateData['new_data'])) {
-            $data['authorization']['oauth_api']['credentials']['#data'] = $stateData['new_data'];
+        if (isset($stateData['custom'])) {
+            $data['authorization']['oauth_api'] = $stateData['custom'];
         }
 
         #################################################3
@@ -137,6 +129,9 @@ class Extractor
     private function loadStateFile(string $dataDir, $folder = 'in'): array
     {
         try {
+            echo "\n\n";
+            echo $dataDir . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . 'state.json';
+            echo "\n\n";
             $data = $this->loadJSONFile($dataDir, $folder . DIRECTORY_SEPARATOR . 'state.json');
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
@@ -257,18 +252,33 @@ class Extractor
         }
 
         // pull custom data out of the file and merge back
-        $authFile = $this->dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'auth.json';
-        if (file_exists($authFile)) {
-            $authData = json_decode(file_get_contents($authFile), true);
+        $stateOutFile = $this->latestConfigFile('/data');
+        if (file_exists($stateOutFile)) {
+            $customData = json_decode(file_get_contents($stateOutFile), true);
             if (json_last_error() === JSON_ERROR_NONE) {
-                echo 'NEW TOKEN';
-                echo '\n';
-                print_r($authData);
-                $data = array_merge($data, $authData);
+                if (count($customData) > 0) {
+                    $data['custom'] = $customData['custom'];
+                }
             }
         }
 
         file_put_contents($dirPath . DIRECTORY_SEPARATOR . 'state.json', json_encode($data));
+    }
+
+    public function latestConfigFile($dir)
+    {
+        $files = [$dir . '/out/state.json', $dir . '/in/state.json', $dir . '/config.json'];
+        $filesWithTime = [];
+        foreach ($files as $file) {
+            if (!file_exists($file)) {
+                continue;
+            }
+
+            $filesWithTime[ filemtime($file) ] = $file;
+        }
+        ksort($filesWithTime);
+
+        return end($filesWithTime);
     }
 
     /**

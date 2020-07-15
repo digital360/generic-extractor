@@ -22,14 +22,7 @@ function moveNewStateFile(\Monolog\Logger $logger)
 
     $dataDir = $arguments["data"];
 
-    // replace the state.json in /in/ dir
-    // read the in/state.json
     $configuration = new Extractor($dataDir, $logger);
-    echo "\n";
-    echo 'Save new auth file';
-    echo "\n";
-    echo json_encode($configuration->getFullConfigArray(),true);
-    echo "\n";
     $configuration->saveConfigMetadata($configuration->getFullConfigArray());
 }
 
@@ -42,22 +35,18 @@ try {
     // trigger other exceptions based on the type
     switch ($e) {
         case $e instanceof UserException:
-            echo '######### UserException #########';
             $logger->error($e->getMessage(), (array)$e->getData());
             exit(1);
             break;
 
 
         case $e instanceof \Keboola\Juicer\Exception\UserException:
-            echo '######### \Keboola\Juicer\Exception\UserException #########';
             $logger->error($e->getMessage(), (array)$e->getData());
             exit(1);
             break;
 
 
         case $e instanceof ApplicationException:
-            echo '######### ApplicationException #########';
-
             $logger->error($e->getMessage(), (array)$e->getData());
             exit($e->getCode() > 1 ? $e->getCode() : 2);
             break;
@@ -66,9 +55,6 @@ try {
             if ($e instanceof \GuzzleHttp\Exception\RequestException
                 && $e->getPrevious() instanceof UserException) {
                 /** @var UserException $ex */
-
-                echo '######### RequestException AND UserException #########';
-
                 $ex = $e->getPrevious();
                 $logger->error($ex->getMessage(), (array)$ex->getData());
                 exit(1);
