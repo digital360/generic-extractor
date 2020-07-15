@@ -85,8 +85,10 @@ class Extractor
         $stateOutFile = $dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'state.json';
         $stateData = [];
         if (file_exists($stateOutFile)) {
+            echo "OUT State \n";
             $stateData = $this->loadStateFile($dataDir, 'out');
         } else {
+            echo "IN State \n";
             $stateData = $this->loadStateFile($dataDir);
         }
 
@@ -234,6 +236,8 @@ class Extractor
             throw new UserException("The 'api' section is required in configuration.");
         }
 
+        echo "<pre>";
+        print_r($this->config['parameters']['api']);
         return new Api($this->logger, $this->config['parameters']['api'], $configAttributes, $authorization);
     }
 
