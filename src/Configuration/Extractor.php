@@ -106,7 +106,7 @@ class Extractor
         }
 
         echo "\n\n\n";
-        print_r(['DATA', $data]);
+        print_r(['DATA', json_encode($data, true)]);
 
         #################################################3
 
