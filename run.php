@@ -28,6 +28,8 @@ function moveNewStateFile(\Monolog\Logger $logger)
     echo "\n";
     echo 'Save new auth file';
     echo "\n";
+    echo json_encode($configuration->getFullConfigArray(),true);
+    echo "\n";
     $configuration->saveConfigMetadata($configuration->getFullConfigArray());
 }
 
