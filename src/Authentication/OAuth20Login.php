@@ -4,7 +4,6 @@ namespace Keboola\GenericExtractor\Authentication;
 
 use Keboola\GenericExtractor\Configuration\UserFunction;
 use Keboola\GenericExtractor\Exception\UserException;
-use Keboola\Juicer\Client\RestClient;
 use Keboola\Juicer\Client\RestRequest;
 use Keboola\Utils\Exception\JsonDecodeException;
 
@@ -90,14 +89,5 @@ class OAuth20Login extends Login
         }
 
         return new RestRequest($config);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function authenticateClient(RestClient $client)
-    {
-        // call login's method
-        parent::authenticateClient($client);
     }
 }
