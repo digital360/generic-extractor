@@ -261,6 +261,9 @@ class Extractor
         if (file_exists($authFile)) {
             $authData = json_decode(file_get_contents($authFile), true);
             if (json_last_error() === JSON_ERROR_NONE) {
+                echo 'NEW TOKEN';
+                echo '\n';
+                print_r($authData);
                 $data = array_merge($data, $authData);
             }
         }

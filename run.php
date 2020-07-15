@@ -42,18 +42,22 @@ try {
     // trigger other exceptions based on the type
     switch ($e) {
         case $e instanceof UserException:
+            echo '######### UserException #########';
             $logger->error($e->getMessage(), (array)$e->getData());
             exit(1);
             break;
 
 
         case $e instanceof \Keboola\Juicer\Exception\UserException:
+            echo '######### \Keboola\Juicer\Exception\UserException #########';
             $logger->error($e->getMessage(), (array)$e->getData());
             exit(1);
             break;
 
 
-        case $e instanceof UserException:
+        case $e instanceof ApplicationException:
+            echo '######### ApplicationException #########';
+
             $logger->error($e->getMessage(), (array)$e->getData());
             exit($e->getCode() > 1 ? $e->getCode() : 2);
             break;
@@ -62,6 +66,9 @@ try {
             if ($e instanceof \GuzzleHttp\Exception\RequestException
                 && $e->getPrevious() instanceof UserException) {
                 /** @var UserException $ex */
+
+                echo '######### RequestException AND UserException #########';
+
                 $ex = $e->getPrevious();
                 $logger->error($ex->getMessage(), (array)$ex->getData());
                 exit(1);
