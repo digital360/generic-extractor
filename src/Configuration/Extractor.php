@@ -64,6 +64,9 @@ class Extractor
     private function loadConfigFile(string $dataDir): array
     {
         $data = $this->loadJSONFile($dataDir, 'config.json');
+        if (count($data) > 0) {
+            echo "Config Path: " . $dataDir;
+        }
 
         $processor = new Processor();
         try {
@@ -83,11 +86,15 @@ class Extractor
 
         // load creds to state.json
         $stateOutFile = '/data/out/state.json';
+        $stateData = [];
         if (file_exists($stateOutFile)) {
             echo "reading OUT state file";
             $stateData = $this->loadStateFile($dataDir, 'out');
-        } else {
-            $stateData = $this->loadStateFile($dataDir);
+        }
+
+        $stateInFile = '/data/in/state.json';
+        if (file_exists($stateInFile)) {
+            $stateData = $this->loadStateFile($dataDir, 'in');
             echo "reading IN state file";
         }
 
