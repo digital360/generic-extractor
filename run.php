@@ -41,10 +41,6 @@ try {
 
 
         case $e instanceof \Keboola\Juicer\Exception\UserException:
-            // touch the state in/state.json
-            $data = ['altered' => '1'];
-            moveNewStateFile($logger, $data);
-
             $logger->error($e->getMessage(), (array)$e->getData());
             exit(1);
             break;
