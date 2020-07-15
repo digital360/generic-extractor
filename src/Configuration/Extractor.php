@@ -237,7 +237,7 @@ class Extractor
         }
 
         echo "<pre>";
-        print_r($this->config['parameters']['api']);
+        print_r($this->config);
         return new Api($this->logger, $this->config['parameters']['api'], $configAttributes, $authorization);
     }
 
