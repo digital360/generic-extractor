@@ -263,7 +263,7 @@ class Extractor
         }
 
         // pull custom data out of the file and merge back
-        $stateOutFile = $this->dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'state.json';
+        $stateOutFile = $this->dataDir . DIRECTORY_SEPARATOR . 'config.json';
         if (file_exists($stateOutFile)) {
             $customData = json_decode(file_get_contents($stateOutFile), true);
             if (json_last_error() === JSON_ERROR_NONE) {
