@@ -6,9 +6,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Event\CompleteEvent;
 use GuzzleHttp\Event\RequestEvents;
 use GuzzleHttp\Event\SubscriberInterface;
-use Keboola\GenericExtractor\Configuration\Extractor;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 
 /**
  * Might better be able to work with ANY type of auth, and tweak the request accordingly
@@ -36,15 +33,28 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
     private function saveCredsfile()
     {
-        $dirPath = '/data'.DIRECTORY_SEPARATOR;
+        $dirPath = '/data/out/';
         if (!is_dir($dirPath)) {
             mkdir($dirPath);
         }
         $data = $this->buildConfigArray();
 
-        file_put_contents($dirPath.'out'.DIRECTORY_SEPARATOR.'state.json', json_encode(['custom' => $data]));
+        file_put_contents('/data/out/auth.json', json_encode(['new_data' => $data]));
     }
 
+    /**
+     * @throws \Exception
+     */
+    private function buildConfigArray(): array
+    {
+        if (getenv('APP_ENV') == 'dev') {
+            $encryptedTokens = $this->_response_token;
+        } else {
+            $encryptedTokens = $this->getEncrypted($this->_response_token);
+        }
+
+        return $encryptedTokens;
+    }
 
     public function getEncrypted(string $string)
     {
@@ -55,41 +65,14 @@ class OAuthResponseSubscriber implements SubscriberInterface
                 'headers' => [
                     'content-type' => 'text/plain',
                 ],
-                'query' => [
+                'query'   => [
                     'componentId' => getenv('KBC_COMPONENTID'),
-                    'projectId' => getenv('KBC_PROJECTID'),
+                    'projectId'   => getenv('KBC_PROJECTID'),
                 ],
-                'body' => $string,
+                'body'    => $string,
             ]
         );
 
         return $r->getBody()->getContents();
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function buildConfigArray(): array
-    {
-        // load the original config file
-        $logger = new Logger("logger");
-        $stream = fopen('php://stdout', 'r');
-        $logger->pushHandler(new StreamHandler($stream));
-        $configuration = new Extractor('/data', $logger);
-        $configFile = $configuration->getFullConfigArray();
-
-        if (getenv('APP_ENV') == 'dev') {
-            $encryptedTokens = $this->_response_token;
-        } else {
-            $encryptedTokens = $this->getEncrypted($this->_response_token);
-        }
-
-        return [
-            'credentials' => [
-                '#data' => $encryptedTokens,
-                'appKey' => $configFile['authorization']['oauth_api']['credentials']['appKey'],
-                '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
-            ],
-        ];
     }
 }

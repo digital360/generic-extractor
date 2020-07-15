@@ -99,8 +99,8 @@ class Extractor
             }
         }
 
-        if (isset($stateData['custom'])) {
-            $data['authorization']['oauth_api'] = $stateData['custom'];
+        if (isset($stateData['new_data'])) {
+            $data['authorization']['oauth_api']['credentials']['#data'] = $stateData['new_data'];
         }
 
         #################################################3
@@ -257,16 +257,11 @@ class Extractor
         }
 
         // pull custom data out of the file and merge back
-        $stateFile = $this->dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'state.json';
-        if (!file_exists($stateFile)) {
-            $stateFile = $this->dataDir . DIRECTORY_SEPARATOR . 'config.json';
-        }
-        if (file_exists($stateFile)) {
-            $customData = json_decode(file_get_contents($stateFile), true);
+        $authFile = $this->dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'auth.json';
+        if (file_exists($authFile)) {
+            $authData = json_decode(file_get_contents($authFile), true);
             if (json_last_error() === JSON_ERROR_NONE) {
-                if (count($customData) > 0) {
-                    $data['custom'] = $customData['custom'];
-                }
+                $data = array_merge($data, $authData);
             }
         }
 
