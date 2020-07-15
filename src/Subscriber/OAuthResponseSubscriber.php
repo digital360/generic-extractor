@@ -45,7 +45,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
     /**
      * @throws \Exception
      */
-    private function buildConfigArray(): array
+    private function buildConfigArray(): string
     {
         if (getenv('APP_ENV') == 'dev') {
             $encryptedTokens = $this->_response_token;
