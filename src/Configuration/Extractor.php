@@ -258,7 +258,7 @@ class Extractor
 
         // pull custom data out of the file and merge back
         $stateFile = $this->dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'state.json';
-        if (!fileExists($stateFile)) {
+        if (!file_exists($stateFile)) {
             $stateFile = $this->dataDir . DIRECTORY_SEPARATOR . 'config.json';
         }
         if (file_exists($stateFile)) {
