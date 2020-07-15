@@ -4,9 +4,9 @@ namespace Keboola\GenericExtractor\Authentication;
 
 use Keboola\GenericExtractor\Configuration\UserFunction;
 use Keboola\GenericExtractor\Exception\UserException;
-use Keboola\Juicer\Client\RestRequest;
-use Keboola\Juicer\Client\RestClient;
 use Keboola\GenericExtractor\Subscriber\LoginSubscriber;
+use Keboola\Juicer\Client\RestClient;
+use Keboola\Juicer\Client\RestRequest;
 use Keboola\Utils\Exception\NoDataFoundException;
 
 /**
@@ -43,8 +43,10 @@ class Login implements AuthInterface
 
     /**
      * Login constructor.
+     *
      * @param array $configAttributes
      * @param array $authentication
+     *
      * @throws UserException
      */
     public function __construct(array $configAttributes, array $authentication)
@@ -77,26 +79,11 @@ class Login implements AuthInterface
     }
 
     /**
-     * @param array $config
-     * @throws UserException
-     * @return RestRequest
-     */
-    protected function getAuthRequest(array $config) : RestRequest
-    {
-        if (!empty($config['params'])) {
-            $config['params'] = UserFunction::build($config['params'], ['attr' => $this->configAttributes]);
-        }
-        if (!empty($config['headers'])) {
-            $config['headers'] = UserFunction::build($config['headers'], ['attr' => $this->configAttributes]);
-        }
-        return new RestRequest($config);
-    }
-
-    /**
      * @inheritdoc
      */
     public function authenticateClient(RestClient $client)
     {
+        echo "authenticateClient metho \n";
         $loginRequest = $this->getAuthRequest($this->auth['loginRequest']);
         $sub = new LoginSubscriber();
 
@@ -116,7 +103,7 @@ class Login implements AuthInterface
                 $client->getClient()->getEmitter()->attach($sub);
 
                 return [
-                    'query' => $this->getResults($response, 'query'),
+                    'query'   => $this->getResults($response, 'query'),
                     'headers' => $this->getResults($response, 'headers'),
                     'expires' => $this->getExpiry($response)
                 ];
@@ -127,47 +114,68 @@ class Login implements AuthInterface
     }
 
     /**
+     * @param array $config
+     *
+     * @return RestRequest
+     * @throws UserException
+     */
+    protected function getAuthRequest(array $config): RestRequest
+    {
+        if (!empty($config['params'])) {
+            $config['params'] = UserFunction::build($config['params'], ['attr' => $this->configAttributes]);
+        }
+        if (!empty($config['headers'])) {
+            $config['headers'] = UserFunction::build($config['headers'], ['attr' => $this->configAttributes]);
+        }
+
+        return new RestRequest($config);
+    }
+
+    /**
      * Maps data from login result into $type (header/query)
      *
      * @param \stdClass $response
-     * @param string $type
+     * @param string    $type
+     *
      * @return array
      * @throws UserException
      */
-    protected function getResults(\stdClass $response, $type) : array
+    protected function getResults(\stdClass $response, $type): array
     {
         $result = [];
-        if (!empty($this->auth['apiRequest'][$type])) {
+        if (!empty($this->auth['apiRequest'][ $type ])) {
             $result = UserFunction::build(
-                $this->auth['apiRequest'][$type],
+                $this->auth['apiRequest'][ $type ],
                 [
                     'response' => \Keboola\Utils\objectToArray($response),
-                    'attr' => $this->configAttributes
+                    'attr'     => $this->configAttributes
                 ]
             );
             // for backward compatibility, check the values if they are a valid path within the response
             foreach ($result as $key => $value) {
                 try {
-                    $result[$key] = \Keboola\Utils\getDataFromPath($value, $response, '.', false);
+                    $result[ $key ] = \Keboola\Utils\getDataFromPath($value, $response, '.', false);
                 } catch (NoDataFoundException $e) {
                     // silently ignore invalid paths as they are probably values already processed by functions
                 }
             }
         }
+
         return $result;
     }
 
     /**
      * @param \stdClass $response
+     *
      * @return int|null
      * @throws UserException
      */
-    protected function getExpiry(\stdClass $response) : ?int
+    protected function getExpiry(\stdClass $response): ?int
     {
         if (!isset($this->auth['expires'])) {
             return null;
         } elseif (is_numeric($this->auth['expires'])) {
-            return time() + (int) $this->auth['expires'];
+            return time() + (int)$this->auth['expires'];
         } elseif (is_array($this->auth['expires'])) {
             $rExpiry = \Keboola\Utils\getDataFromPath($this->auth['expires']['response'], $response, '.');
             $expiry = is_int($rExpiry) ? $rExpiry : strtotime($rExpiry);
@@ -182,6 +190,7 @@ class Login implements AuthInterface
 
             return $expiry;
         }
+
         return null;
     }
 }

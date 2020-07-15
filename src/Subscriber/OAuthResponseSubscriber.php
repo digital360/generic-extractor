@@ -31,45 +31,27 @@ class OAuthResponseSubscriber implements SubscriberInterface
         if (isset($responseArr['refresh_token'])) {
             echo "INSIDE the refresh_token";
             echo "\n";
-            echo $jsonResponse;
+            print_r($responseArr);
             $this->_response_token = $jsonResponse;
             $this->saveCredsfile();
+        } else {
+            echo "\n";
+            echo "OUTSIDE the refresh_token";
+            print_r($responseArr);
         }
 
-        echo "\n";
-        echo "OUTSIDE the refresh_token";
+
     }
 
     private function saveCredsfile()
     {
-        $dirPath = '/data'.DIRECTORY_SEPARATOR;
+        $dirPath = '/data' . DIRECTORY_SEPARATOR;
         if (!is_dir($dirPath)) {
             mkdir($dirPath);
         }
         $data = $this->buildConfigArray();
 
-        file_put_contents($dirPath.'out'.DIRECTORY_SEPARATOR.'state.json', json_encode(['custom' => $data]));
-    }
-
-
-    public function getEncrypted(string $string)
-    {
-        $client = new Client();
-        $r = $client->post(
-            'https://encryption.keboola.com/encrypt',
-            [
-                'headers' => [
-                    'content-type' => 'text/plain',
-                ],
-                'query' => [
-                    'componentId' => getenv('KBC_COMPONENTID'),
-                    'projectId' => getenv('KBC_PROJECTID'),
-                ],
-                'body' => $string,
-            ]
-        );
-
-        return $r->getBody()->getContents();
+        file_put_contents($dirPath . 'out' . DIRECTORY_SEPARATOR . 'state.json', json_encode(['custom' => $data]));
     }
 
     /**
@@ -92,10 +74,30 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
         return [
             'credentials' => [
-                '#data' => $encryptedTokens,
-                'appKey' => $configFile['authorization']['oauth_api']['credentials']['appKey'],
+                '#data'      => $encryptedTokens,
+                'appKey'     => $configFile['authorization']['oauth_api']['credentials']['appKey'],
                 '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
             ],
         ];
+    }
+
+    public function getEncrypted(string $string)
+    {
+        $client = new Client();
+        $r = $client->post(
+            'https://encryption.keboola.com/encrypt',
+            [
+                'headers' => [
+                    'content-type' => 'text/plain',
+                ],
+                'query'   => [
+                    'componentId' => getenv('KBC_COMPONENTID'),
+                    'projectId'   => getenv('KBC_PROJECTID'),
+                ],
+                'body'    => $string,
+            ]
+        );
+
+        return $r->getBody()->getContents();
     }
 }
