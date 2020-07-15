@@ -55,7 +55,6 @@ class Executor
         $metadata['time']['previousStart'] =
             empty($metadata['time']['previousStart']) ? 0 : $metadata['time']['previousStart'];
         $metadata['time']['currentStart'] = time();
-        $cacheStorage = $configuration->getCache();
 
         $results = [];
         /** @var Config[] $configs */
@@ -77,10 +76,6 @@ class Executor
                 $api,
                 $sshProxy
             );
-
-            if ($cacheStorage) {
-                $extractor->enableCache($cacheStorage);
-            }
 
             if (!empty($results[ $outputBucket ])) {
                 $extractor->setParser($results[ $outputBucket ]['parser']);

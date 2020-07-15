@@ -129,9 +129,6 @@ class Extractor
             }
 
             $data = $this->loadJSONFile($dataDir, $folder . DIRECTORY_SEPARATOR . 'state.json');
-            if (isset($data['time']['previousStart'])) {
-                $data['time']['previousStart'] = 0;
-            }
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
             $this->logger->warning("State file not found " . $e->getMessage());
