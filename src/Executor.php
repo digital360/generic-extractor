@@ -26,28 +26,12 @@ class Executor
 
     /**
      * Executor constructor.
-     * @param  Logger  $logger
+     *
+     * @param Logger $logger
      */
     public function __construct(Logger $logger)
     {
         $this->logger = $logger;
-    }
-
-    /**
-     * @param  bool  $debug
-     */
-    private function setLogLevel($debug)
-    {
-        /** @var AbstractHandler $handler */
-        foreach ($this->logger->getHandlers() as $handler) {
-            if ($handler instanceof AbstractHandler) {
-                if ($debug) {
-                    $handler->setLevel($this->logger::DEBUG);
-                } else {
-                    $handler->setLevel($this->logger::INFO);
-                }
-            }
-        }
     }
 
     public function run()
@@ -82,7 +66,7 @@ class Executor
             if (!empty($config->getAttribute('outputBucket'))) {
                 $outputBucket = $config->getAttribute('outputBucket');
             } elseif ($config->getAttribute('id')) {
-                $outputBucket = 'ex-api-'.$api->getName()."-".$config->getAttribute('id');
+                $outputBucket = 'ex-api-' . $api->getName() . "-" . $config->getAttribute('id');
             } else {
                 $outputBucket = "__kbc_default";
             }
@@ -98,8 +82,8 @@ class Executor
                 $extractor->enableCache($cacheStorage);
             }
 
-            if (!empty($results[$outputBucket])) {
-                $extractor->setParser($results[$outputBucket]['parser']);
+            if (!empty($results[ $outputBucket ])) {
+                $extractor->setParser($results[ $outputBucket ]['parser']);
             }
             $extractor->setMetadata($metadata);
 
@@ -107,8 +91,8 @@ class Executor
 
             $metadata = $extractor->getMetadata();
 
-            $results[$outputBucket]['parser'] = $extractor->getParser();
-            $results[$outputBucket]['incremental'] = $config->getAttribute('incrementalOutput');
+            $results[ $outputBucket ]['parser'] = $extractor->getParser();
+            $results[ $outputBucket ]['incremental'] = $config->getAttribute('incrementalOutput');
         }
 
         foreach ($results as $bucket => $result) {
@@ -125,7 +109,7 @@ class Executor
             // move files and flatten file structure
             $folderFinder = new Finder();
             $fs = new Filesystem();
-            $folders = $folderFinder->directories()->in($arguments['data']."/out/tables")->depth(0);
+            $folders = $folderFinder->directories()->in($arguments['data'] . "/out/tables")->depth(0);
             foreach ($folders as $folder) {
                 /** @var SplFileInfo $folder */
                 $filesFinder = new Finder();
@@ -133,8 +117,8 @@ class Executor
                 /** @var SplFileInfo $file */
                 foreach ($files as $file) {
                     $destination =
-                        $arguments['data']."/out/tables/".basename($folder->getPathname()).
-                        ".".basename($file->getPathname());
+                        $arguments['data'] . "/out/tables/" . basename($folder->getPathname()) .
+                        "." . basename($file->getPathname());
                     // maybe move will be better?
                     $fs->rename($file->getPathname(), $destination);
                 }
@@ -152,15 +136,32 @@ class Executor
     private function createSshTunnel($sshConfig): string
     {
         $tunnelParams = [
-            'user' => $sshConfig['user'],
-            'sshHost' => $sshConfig['host'],
-            'sshPort' => $sshConfig['port'],
-            'localPort' => 33006,
+            'user'       => $sshConfig['user'],
+            'sshHost'    => $sshConfig['host'],
+            'sshPort'    => $sshConfig['port'],
+            'localPort'  => 33006,
             'privateKey' => $sshConfig['#privateKey'],
         ];
-        $this->logger->info("Creating SSH tunnel to '".$tunnelParams['sshHost']."'");
+        $this->logger->info("Creating SSH tunnel to '" . $tunnelParams['sshHost'] . "'");
         (new SSH())->openTunnel($tunnelParams);
 
         return sprintf('socks5h://127.0.0.1:%s', $tunnelParams['localPort']);
+    }
+
+    /**
+     * @param bool $debug
+     */
+    private function setLogLevel($debug)
+    {
+        /** @var AbstractHandler $handler */
+        foreach ($this->logger->getHandlers() as $handler) {
+            if ($handler instanceof AbstractHandler) {
+                if ($debug) {
+                    $handler->setLevel($this->logger::DEBUG);
+                } else {
+                    $handler->setLevel($this->logger::INFO);
+                }
+            }
+        }
     }
 }

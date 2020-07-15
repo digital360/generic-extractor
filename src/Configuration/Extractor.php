@@ -82,16 +82,23 @@ class Extractor
         }
 
         // load creds to state.json
-        $stateOutFile = $dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'state.json';
+        $stateOutFile = '/data/out/state.json';
         if (file_exists($stateOutFile)) {
+            echo "reading OUT state file";
             $stateData = $this->loadStateFile($dataDir, 'out');
         } else {
             $stateData = $this->loadStateFile($dataDir);
+            echo "reading IN state file";
         }
 
+        echo "<pre>";
+        print_r(['STATE', $stateData]);
         if (isset($stateData['custom'])) {
             $data['authorization']['oauth_api'] = $stateData['custom'];
         }
+
+        echo "\n\n\n";
+        print_r(['DATA', $data]);
 
         #################################################3
 
