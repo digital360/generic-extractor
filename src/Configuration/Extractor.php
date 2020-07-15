@@ -75,9 +75,15 @@ class Extractor
 
 
         // merge custom data to config object
-        #######################################3
+        #######################################
+        // remove the dead lock
+        if (isset($data['parameters']['deadlock']) && $data['parameters']['deadlock'] == 'remove') {
+            unlink($dataDir . DIRECTORY_SEPARATOR . 'in' . DIRECTORY_SEPARATOR . 'state.json');
+        }
+
         // load creds to state.json
         $stateOutFile = $dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'state.json';
+        $stateData = [];
         if (file_exists($stateOutFile)) {
             $stateData = $this->loadStateFile($dataDir, 'out');
         } else {
@@ -122,12 +128,6 @@ class Extractor
     private function loadStateFile(string $dataDir, $folder = 'in'): array
     {
         try {
-
-            // remove the dead lock
-            if (isset($data['parameters']['deadlock']) && $data['parameters']['deadlock'] == 'remove') {
-                unlink($dataDir . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . 'state.json');
-            }
-
             $data = $this->loadJSONFile($dataDir, $folder . DIRECTORY_SEPARATOR . 'state.json');
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
