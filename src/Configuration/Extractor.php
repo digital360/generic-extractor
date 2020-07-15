@@ -252,12 +252,8 @@ class Extractor
             mkdir($dirPath);
         }
 
-        if (is_null($configFile)) {
-            // pull custom data out of the file and merge back
-            $stateOutFile = $this->latestConfigFile('/data');
-        } else {
-
-        }
+        // pull custom data out of the file and merge back
+        $stateOutFile = $this->latestConfigFile('/data');
         if (file_exists($stateOutFile)) {
             $customData = json_decode(file_get_contents($stateOutFile), true);
             if (json_last_error() === JSON_ERROR_NONE) {
