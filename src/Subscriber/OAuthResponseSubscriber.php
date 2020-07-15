@@ -9,6 +9,7 @@ use GuzzleHttp\Event\SubscriberInterface;
 use Keboola\GenericExtractor\Configuration\Extractor;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 /**
  * Might better be able to work with ANY type of auth, and tweak the request accordingly
@@ -16,7 +17,13 @@ use Monolog\Logger;
 class OAuthResponseSubscriber implements SubscriberInterface
 {
 
+    private $logger;
     private $_response_token;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
 
     public function getEvents()
     {
@@ -29,12 +36,10 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $jsonResponse = $event->getResponse()->getBody()->getContents();
         $responseArr = json_decode($jsonResponse, true);
         if (isset($responseArr['refresh_token'])) {
-            print_r($responseArr);
+            $this->logger->debug((string)$responseArr);
             $this->_response_token = $jsonResponse;
             $this->saveCredsfile();
         }
-
-
     }
 
     private function saveCredsfile()

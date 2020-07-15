@@ -8,6 +8,7 @@ use GuzzleHttp\Subscriber\Cache\CacheSubscriber;
 use Keboola\GenericExtractor\Configuration\Api;
 use Keboola\GenericExtractor\Configuration\JuicerRest;
 use Keboola\GenericExtractor\Configuration\UserFunction;
+use Keboola\GenericExtractor\Subscriber\OAuthResponseSubscriber;
 use Keboola\Juicer\Config\JobConfig;
 use Keboola\Juicer\Config\Config;
 use Keboola\Juicer\Client\RestClient;
@@ -102,9 +103,11 @@ class GenericExtractor
             $this->api->getIgnoreErrors()
         );
 
+        echo "BEFORE AUTH \n";
         $this->api->getAuth()->authenticateClient($client);
         // Verbose Logging of all requests
         $client->getClient()->getEmitter()->attach(new LogRequest($this->logger));
+        $client->getClient()->getEmitter()->attach(new OAuthResponseSubscriber($this->logger));
 
         if ($this->cache) {
             CacheSubscriber::attach(
