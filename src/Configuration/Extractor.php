@@ -76,11 +76,6 @@ class Extractor
 
         // merge custom data to config object
         #######################################3
-        // remove the dead lock
-        if (isset($data['parameters']['deadlock']) && $data['parameters']['deadlock'] == 'remove') {
-            unlink('/data/in/state.json');
-        }
-
         // load creds to state.json
         $stateOutFile = $dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'state.json';
         if (file_exists($stateOutFile)) {
@@ -127,7 +122,16 @@ class Extractor
     private function loadStateFile(string $dataDir, $folder = 'in'): array
     {
         try {
+
+            // remove the dead lock
+            if (isset($data['parameters']['deadlock']) && $data['parameters']['deadlock'] == 'remove') {
+                unlink($dataDir . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . 'state.json');
+            }
+
             $data = $this->loadJSONFile($dataDir, $folder . DIRECTORY_SEPARATOR . 'state.json');
+            if (isset($data['time']['previousStart'])) {
+                $data['time']['previousStart'] = 0;
+            }
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
             $this->logger->warning("State file not found " . $e->getMessage());
@@ -141,9 +145,6 @@ class Extractor
             //$this->logger->warning("State file configuration is invalid: " . $e->getMessage());
         }
 
-        echo 'STATE FILE';
-        echo "\n";
-        echo json_encode($data);
         return $data;
     }
 
