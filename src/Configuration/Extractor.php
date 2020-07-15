@@ -99,7 +99,8 @@ class Extractor
         }
 
         echo "<pre>";
-        print_r(['STATE', $stateData]);
+        print_r(['STATE', json_encode($stateData, true)]);
+        print_r(['token', json_encode($stateData['custom']['credentials']['#data'] ?? 'NOTHING', true)]);
 
         if (isset($stateData['custom'])) {
             $data['authorization']['oauth_api'] = $stateData['custom'];
