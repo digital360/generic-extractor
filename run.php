@@ -4,7 +4,7 @@ use Keboola\GenericExtractor\Configuration\Extractor;
 use Keboola\GenericExtractor\Exception\UserException;
 use Keboola\GenericExtractor\Executor;
 
-require_once(__DIR__."/vendor/autoload.php");
+require_once(__DIR__ . "/vendor/autoload.php");
 
 // initialize logger
 $logger = new Monolog\Logger("logger");
@@ -22,10 +22,6 @@ function moveNewStateFile(\Monolog\Logger $logger)
 
     $dataDir = $arguments["data"];
 
-    echo "\n";
-    echo 'Look for the auth file inside the out dir';
-    echo "\n";
-
     // replace the state.json in /in/ dir
     // read the in/state.json
     $configuration = new Extractor($dataDir, $logger);
@@ -39,7 +35,7 @@ try {
     $executor = new Executor($logger);
     $executor->run();
 } catch (Exception $e) {
-    // moveNewStateFile($logger);
+    moveNewStateFile($logger);
 
     // trigger other exceptions based on the type
     switch ($e) {
@@ -71,9 +67,9 @@ try {
             $logger->error(
                 $e->getMessage(),
                 [
-                    'errFile' => $e->getFile(),
-                    'errLine' => $e->getLine(),
-                    'trace' => $e->getTrace(),
+                    'errFile'   => $e->getFile(),
+                    'errLine'   => $e->getLine(),
+                    'trace'     => $e->getTrace(),
                     'exception' => get_class($e),
                 ]
             );

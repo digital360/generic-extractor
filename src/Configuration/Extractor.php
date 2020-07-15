@@ -100,6 +100,7 @@ class Extractor
 
         echo "<pre>";
         print_r(['STATE', $stateData]);
+
         if (isset($stateData['custom'])) {
             $data['authorization']['oauth_api'] = $stateData['custom'];
         }
