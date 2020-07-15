@@ -44,8 +44,9 @@ class Extractor
 
     /**
      * Extractor constructor.
-     * @param $dataDir
-     * @param  LoggerInterface  $logger
+     *
+     * @param                 $dataDir
+     * @param LoggerInterface $logger
      */
     public function __construct(string $dataDir, LoggerInterface $logger)
     {
@@ -56,27 +57,8 @@ class Extractor
     }
 
     /**
-     * @param  string  $dataDir
-     * @param  string  $name
-     * @return array
-     */
-    private function loadJSONFile(string $dataDir, string $name): array
-    {
-        $fileName = $dataDir.DIRECTORY_SEPARATOR.$name;
-        if (!file_exists($fileName)) {
-            throw new ApplicationException("Configuration file '$fileName' not found.");
-        }
-        $data = json_decode(file_get_contents($fileName), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new ApplicationException("Configuration file is not a valid JSON: ".json_last_error_msg());
-        }
-
-        return $data;
-    }
-
-
-    /**
-     * @param  string  $dataDir
+     * @param string $dataDir
+     *
      * @return array
      */
     private function loadConfigFile(string $dataDir): array
@@ -100,11 +82,9 @@ class Extractor
         }
 
         // load creds to state.json
-        $stateOutFile = $dataDir.DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'state.json';
+        $stateOutFile = $dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'state.json';
         if (file_exists($stateOutFile)) {
             $stateData = $this->loadStateFile($dataDir, 'out');
-            echo '<pre>';
-            print_r($stateData['custom']);
         } else {
             $stateData = $this->loadStateFile($dataDir);
         }
@@ -119,20 +99,38 @@ class Extractor
     }
 
     /**
-     * @param  string  $dataDir
-     * @param  string  $folder
+     * @param string $dataDir
+     * @param string $name
+     *
+     * @return array
+     */
+    private function loadJSONFile(string $dataDir, string $name): array
+    {
+        $fileName = $dataDir . DIRECTORY_SEPARATOR . $name;
+        if (!file_exists($fileName)) {
+            throw new ApplicationException("Configuration file '$fileName' not found.");
+        }
+        $data = json_decode(file_get_contents($fileName), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new ApplicationException("Configuration file is not a valid JSON: " . json_last_error_msg());
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param string $dataDir
+     * @param string $folder
+     *
      * @return array
      */
     private function loadStateFile(string $dataDir, $folder = 'in'): array
     {
         try {
-            echo "\n\n";
-            echo $dataDir.DIRECTORY_SEPARATOR.$folder.DIRECTORY_SEPARATOR.'state.json';
-            echo "\n\n";
-            $data = $this->loadJSONFile($dataDir, $folder.DIRECTORY_SEPARATOR.'state.json');
+            $data = $this->loadJSONFile($dataDir, $folder . DIRECTORY_SEPARATOR . 'state.json');
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
-            $this->logger->warning("State file not found ".$e->getMessage());
+            $this->logger->warning("State file not found " . $e->getMessage());
             $data = [];
         }
         $processor = new Processor();
@@ -164,15 +162,8 @@ class Extractor
     }
 
     /**
-     * @return Config[]
-     */
-    public function getFullConfigArray()
-    {
-        return $this->config;
-    }
-
-    /**
-     * @param  array  $params  Values to override those in the config
+     * @param array $params Values to override those in the config
+     *
      * @return Config
      * @throws UserException
      */
@@ -184,6 +175,14 @@ class Extractor
         $configuration = array_replace($this->config['parameters']['config'], $params);
 
         return new Config($configuration);
+    }
+
+    /**
+     * @return Config[]
+     */
+    public function getFullConfigArray()
+    {
+        return $this->config;
     }
 
     public function getSshProxy(): ?array
@@ -215,11 +214,12 @@ class Extractor
         $ttl = !empty($this->config['parameters']['cache']['ttl']) ?
             (int)$this->config['parameters']['cache']['ttl'] : self::CACHE_TTL;
 
-        return new CacheStorage(new FilesystemCache($this->dataDir.DIRECTORY_SEPARATOR.'cache'), null, $ttl);
+        return new CacheStorage(new FilesystemCache($this->dataDir . DIRECTORY_SEPARATOR . 'cache'), null, $ttl);
     }
 
     /**
-     * @param  array  $configAttributes
+     * @param array $configAttributes
+     *
      * @return Api
      */
     public function getApi(array $configAttributes): Api
@@ -237,17 +237,17 @@ class Extractor
     }
 
     /**
-     * @param  array  $data
+     * @param array $data
      */
     public function saveConfigMetadata(array $data)
     {
-        $dirPath = $this->dataDir.DIRECTORY_SEPARATOR.'out';
+        $dirPath = $this->dataDir . DIRECTORY_SEPARATOR . 'out';
         if (!is_dir($dirPath)) {
             mkdir($dirPath);
         }
 
         // pull custom data out of the file and merge back
-        $stateOutFile = $this->dataDir.DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'state.json';
+        $stateOutFile = $this->dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'state.json';
         if (file_exists($stateOutFile)) {
             $customData = json_decode(file_get_contents($stateOutFile), true);
             if (json_last_error() === JSON_ERROR_NONE) {
@@ -257,23 +257,23 @@ class Extractor
             }
         }
 
-        file_put_contents($dirPath.DIRECTORY_SEPARATOR.'state.json', json_encode($data));
+        file_put_contents($dirPath . DIRECTORY_SEPARATOR . 'state.json', json_encode($data));
     }
 
     /**
-     * @param  Table[]  $csvFiles
-     * @param  string  $bucketName
-     * @param  bool  $sapiPrefix  whether to prefix the output bucket with "in.c-"
-     * @param  bool  $incremental  Set the incremental flag in manifest
-     * TODO: revisit this
+     * @param Table[] $csvFiles
+     * @param string  $bucketName
+     * @param bool    $sapiPrefix  whether to prefix the output bucket with "in.c-"
+     * @param bool    $incremental Set the incremental flag in manifest
+     *                             TODO: revisit this
      */
     public function storeResults(array $csvFiles, $bucketName = null, $sapiPrefix = true, $incremental = false)
     {
         $path = "{$this->dataDir}/out/tables/";
 
         if (!is_null($bucketName)) {
-            $path .= $bucketName.'/';
-            $bucketName = $sapiPrefix ? 'in.c-'.$bucketName : $bucketName;
+            $path .= $bucketName . '/';
+            $bucketName = $sapiPrefix ? 'in.c-' . $bucketName : $bucketName;
         }
 
         if (!is_dir($path)) {
@@ -297,8 +297,8 @@ class Extractor
                 $manifest['primary_key'] = $file->getPrimaryKey(true);
             }
 
-            file_put_contents($path.$key.'.manifest', json_encode($manifest));
-            copy($file->getPathname(), $path.$key);
+            file_put_contents($path . $key . '.manifest', json_encode($manifest));
+            copy($file->getPathname(), $path . $key);
         }
     }
 }
