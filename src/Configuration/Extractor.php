@@ -85,8 +85,6 @@ class Extractor
         $stateOutFile = $dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'state.json';
         if (file_exists($stateOutFile)) {
             $stateData = $this->loadStateFile($dataDir, 'out');
-            echo '<pre>';
-            print_r($stateData['custom']);
         } else {
             $stateData = $this->loadStateFile($dataDir);
         }
@@ -129,9 +127,6 @@ class Extractor
     private function loadStateFile(string $dataDir, $folder = 'in'): array
     {
         try {
-            echo "\n\n";
-            echo $dataDir . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . 'state.json';
-            echo "\n\n";
             $data = $this->loadJSONFile($dataDir, $folder . DIRECTORY_SEPARATOR . 'state.json');
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
