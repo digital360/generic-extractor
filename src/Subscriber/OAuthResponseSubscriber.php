@@ -43,13 +43,16 @@ class OAuthResponseSubscriber implements SubscriberInterface
         if (!is_dir($dirPath)) {
             mkdir($dirPath);
         }
-        $data = $this->buildConfigArray();
+        try {
+            $data = $this->buildConfigArray();
+            // update the out file
+            file_put_contents($dirPath . 'out' . DIRECTORY_SEPARATOR . 'state.json', json_encode(['custom' => $data]));
 
-        // update the out file
-        file_put_contents($dirPath . 'out' . DIRECTORY_SEPARATOR . 'state.json', json_encode(['custom' => $data]));
-
-        // update the in file
-        file_put_contents($dirPath . 'in' . DIRECTORY_SEPARATOR . 'state.json', json_encode(['custom' => $data]));
+            // update the in file
+            file_put_contents($dirPath . 'in' . DIRECTORY_SEPARATOR . 'state.json', json_encode(['custom' => $data]));
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Cannot save new auth data');
+        }
     }
 
     /**
