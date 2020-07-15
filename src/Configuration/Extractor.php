@@ -242,17 +242,22 @@ class Extractor
     }
 
     /**
-     * @param array $data
+     * @param array  $data
+     * @param string $configFile
      */
-    public function saveConfigMetadata(array $data)
+    public function saveConfigMetadata(array $data, $configFile = null)
     {
         $dirPath = $this->dataDir . DIRECTORY_SEPARATOR . 'out';
         if (!is_dir($dirPath)) {
             mkdir($dirPath);
         }
 
-        // pull custom data out of the file and merge back
-        $stateOutFile = $this->latestConfigFile('/data');
+        if (is_null($configFile)) {
+            // pull custom data out of the file and merge back
+            $stateOutFile = $this->latestConfigFile('/data');
+        } else {
+
+        }
         if (file_exists($stateOutFile)) {
             $customData = json_decode(file_get_contents($stateOutFile), true);
             if (json_last_error() === JSON_ERROR_NONE) {

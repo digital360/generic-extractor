@@ -12,7 +12,7 @@ $stream = fopen('php://stdout', 'r');
 $logger->pushHandler(new \Monolog\Handler\StreamHandler($stream));
 //$logger->debug("Starting up");
 
-function moveNewStateFile(\Monolog\Logger $logger)
+function moveNewStateFile(\Monolog\Logger $logger, $data = [])
 {
     // do we have the new state.json in /out/ dir?
     $arguments = getopt("d::", ["data::"]);
@@ -23,7 +23,7 @@ function moveNewStateFile(\Monolog\Logger $logger)
     $dataDir = $arguments["data"];
 
     $configuration = new Extractor($dataDir, $logger);
-    $configuration->saveConfigMetadata($configuration->getFullConfigArray());
+    $configuration->saveConfigMetadata(array_merge($configuration->getFullConfigArray(), $data));
 }
 
 try {
@@ -41,6 +41,10 @@ try {
 
 
         case $e instanceof \Keboola\Juicer\Exception\UserException:
+            // touch the state in/state.json
+            $data = ['altered' => '1'];
+            moveNewStateFile($logger, $data);
+
             $logger->error($e->getMessage(), (array)$e->getData());
             exit(1);
             break;
