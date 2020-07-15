@@ -56,6 +56,7 @@ class Executor
             empty($metadata['time']['previousStart']) ? 0 : $metadata['time']['previousStart'];
         $metadata['time']['currentStart'] = time();
         $cacheStorage = $configuration->getCache();
+        $cacheStorage = null;
 
         $results = [];
         /** @var Config[] $configs */
