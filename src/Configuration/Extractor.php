@@ -188,6 +188,12 @@ class Extractor
         return $this->config;
     }
 
+
+    public function getFullStateArray()
+    {
+        return $this->state;
+    }
+
     public function getSshProxy(): ?array
     {
         if (isset($this->config['parameters']['sshProxy'])) {
