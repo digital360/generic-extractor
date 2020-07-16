@@ -86,7 +86,7 @@ class OAuth20Login extends Login
     {
         echo '\n';
         echo "INSIDE getAuthRequest  \n";
-        print_r($this->paramss);;
+        print_r($this->params);;
         echo '\n';
 
         if (!empty($config['params'])) {
