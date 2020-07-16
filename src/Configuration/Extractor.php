@@ -129,6 +129,7 @@ class Extractor
     private function loadStateFile(string $dataDir, $folder = 'in'): array
     {
         try {
+            $stateFile = $dataDir . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . 'state.json'
             $data = $this->loadJSONFile($dataDir, $folder . DIRECTORY_SEPARATOR . 'state.json');
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
@@ -144,8 +145,17 @@ class Extractor
         }
 
         if (count($data)) {
-            echo "STATE FILE";
-            echo $dataDir . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . 'state.json';
+
+            // load creds to state.json
+            if ($stateFile == '/data/in/state.json') {
+                if (file_exists('/data/out/state.json')) {
+                    $stateData = $this->loadStateFile($dataDir, 'out');
+                    if (isset($stateData['custom'])) {
+                        echo "**** CUSTOM LOGIN MERGED";
+                        $data['authorization']['oauth_api'] = $stateData['custom'];
+                    }
+                }
+            }
         }
 
         return $data;
