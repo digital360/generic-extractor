@@ -235,6 +235,9 @@ class Extractor
     {
         if (!empty($this->config['authorization'])) {
             $authorization = $this->config['authorization'];
+            echo 'LINE 237 getAPI';
+            echo "\n";
+            echo json_encode($authorization, true);
         } else {
             $authorization = [];
         }
@@ -282,10 +285,6 @@ class Extractor
             $filesWithTime[ filemtime($file) ] = $file;
         }
         ksort($filesWithTime);
-
-        echo "FILES LIST \n";
-        print_r($filesWithTime);
-        echo "\n";
 
         return end($filesWithTime);
     }
