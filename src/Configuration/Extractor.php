@@ -85,13 +85,14 @@ class Extractor
         $stateOutFile = '/data/out/state.json';
         $stateData = [];
         if (file_exists($stateOutFile)) {
+            echo "CUSTOM MERGED FROM OUT";
             $stateData = $this->loadStateFile($dataDir, 'out');
         } else {
+            echo "CUSTOM MERGED FROM IN";
             $stateData = $this->loadStateFile($dataDir);
         }
 
         if (isset($stateData['custom'])) {
-            echo "CUSTOM LOGIN MERGED";
             $data['authorization']['oauth_api'] = $stateData['custom'];
         }
 
@@ -129,7 +130,7 @@ class Extractor
     private function loadStateFile(string $dataDir, $folder = 'in'): array
     {
         try {
-            $stateFile = $dataDir . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . 'state.json'
+            $stateFile = $dataDir . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . 'state.json';
             $data = $this->loadJSONFile($dataDir, $folder . DIRECTORY_SEPARATOR . 'state.json');
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
