@@ -91,6 +91,7 @@ class Extractor
         }
 
         if (isset($stateData['custom'])) {
+            echo "CUSTOM LOGIN MERGED";
             $data['authorization']['oauth_api'] = $stateData['custom'];
         }
 
@@ -144,7 +145,7 @@ class Extractor
 
         if (count($data)) {
             echo "STATE FILE";
-            echo $dataDir, $folder . DIRECTORY_SEPARATOR . 'state.json';
+            echo $dataDir . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . 'state.json';
         }
 
         return $data;
