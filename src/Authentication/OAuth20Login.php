@@ -105,7 +105,7 @@ class OAuth20Login extends Login
     {
         echo "authenticateClient method \n";
         // call login's method
-        parent::authenticateClient($client);
         $client->getClient()->getEmitter()->attach(new OAuthResponseSubscriber());
+        parent::authenticateClient($client);
     }
 }
