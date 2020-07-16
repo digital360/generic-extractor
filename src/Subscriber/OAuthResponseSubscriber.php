@@ -20,11 +20,6 @@ class OAuthResponseSubscriber implements SubscriberInterface
     private $logger;
     private $_response_token;
 
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
     public function getEvents()
     {
         return ['complete' => ['onComplete', RequestEvents::LATE]];
@@ -37,8 +32,9 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $responseArr = json_decode($jsonResponse, true);
         if (isset($responseArr['refresh_token'])) {
 
+            echo ('TOKEN IS BEEN REFRESHED');
+            echo ("\n");
             print_r($jsonResponse);
-            $this->logger->debug('TOKEN IS BEEN REFRESHED');
             $this->_response_token = $jsonResponse;
             $this->saveCredsfile();
         }
