@@ -121,6 +121,7 @@ class Login implements AuthInterface
     protected function getAuthRequest(array $config): RestRequest
     {
         echo '\n';
+        echo "INSIDE getAuthRequest  \n";
         print_r($this->configAttributes);;
         echo '\n';
         if (!empty($config['params'])) {

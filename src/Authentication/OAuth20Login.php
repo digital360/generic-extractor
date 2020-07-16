@@ -67,10 +67,6 @@ class OAuth20Login extends Login
             throw new UserException("The OAuth data is not a valid JSON");
         }
 
-        echo "OAUTHDATA \n";
-        print_r($oAuthData);
-        echo "\n";
-
         $consumerData = [
             'client_id'     => $oauthApiDetails['appKey'],
             'client_secret' => $oauthApiDetails['#appSecret'],
