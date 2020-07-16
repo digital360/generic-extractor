@@ -70,33 +70,15 @@ class OAuthResponseSubscriber implements SubscriberInterface
             $encryptedTokens = $this->getEncrypted($this->_response_token);
         }
 
-        $newAuthInfo = [
-            'credentials' => [
-                '#data'      => $encryptedTokens,
-                'appKey'     => $configFile['authorization']['oauth_api']['credentials']['appKey'],
-                '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
-            ],
-        ];
+        $authInfo = $configFile['authorization']['oauth_api']['credentials'];
+        $newAuthData = ['#data' => $encryptedTokens];
 
+        $newAuthInfo = ['credentials' => array_merge($authInfo, $newAuthData)];
+
+        echo "JUST before write to /data/in/state.json";
+        echo "\n";
+        print_r($newAuthInfo);
         file_put_contents('/data/in/state.json', json_encode(array_merge($stateFile, ['custom' => $newAuthInfo])));
-
-        $configFile['authorization']['oauth_api']['credentials']['#data'] = $encryptedTokens;
-
-        $client = new Client();
-        $r = $client->put(
-            'https://connection.keboola.com/v2/storage/components/' . getenv('KBC_COMPONENTID') . '/configs/' . getenv('KBC_CONFIGID'),
-            [
-                'headers' => [
-                    'content-type'       => 'application/x-www-form-urlencoded',
-                    'X-StorageApi-Token' => $configFile['parameters']['componentToken'],
-                ],
-                'body'    => 'configuration=' . urlencode(json_encode($configFile)) . '&changeDescription=Updated via api',
-            ]
-        );
-
-
-        echo $r->getBody()->getContents();
-
 
         return $newAuthInfo;
     }

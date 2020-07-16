@@ -73,6 +73,29 @@ class Extractor
             //$this->logger->warning("Configuration file configuration is invalid: " . $e->getMessage());
         }
 
+
+        // merge custom data to config object
+        #######################################
+        // remove the dead lock
+        if (isset($data['parameters']['deadlock']) && $data['parameters']['deadlock'] == 'remove') {
+            unlink($dataDir . DIRECTORY_SEPARATOR . 'in' . DIRECTORY_SEPARATOR . 'state.json');
+        }
+
+        // load creds from the latest file
+        $stateData = [];
+        if (file_exists('/data/in/state.json')) {
+            echo "IN State";
+            echo "\n";
+            $stateData = $this->loadStateFile($dataDir);
+        }
+
+        if (isset($stateData['custom'])) {
+            print_r($stateData['custom']);
+            $data['authorization']['oauth_api'] = $stateData['custom'];
+        }
+
+        #################################################3
+
         return $data;
     }
 
@@ -126,6 +149,14 @@ class Extractor
     /**
      * @return Config[]
      */
+    public function getFullConfigArray()
+    {
+        return $this->config;
+    }
+
+    /**
+     * @return Config[]
+     */
     public function getMultipleConfigs(): array
     {
         if (empty($this->config['parameters']['iterations'])) {
@@ -155,15 +186,6 @@ class Extractor
 
         return new Config($configuration);
     }
-
-    /**
-     * @return Config[]
-     */
-    public function getFullConfigArray()
-    {
-        return $this->config;
-    }
-
 
     public function getFullStateArray()
     {
