@@ -73,30 +73,6 @@ class Extractor
             //$this->logger->warning("Configuration file configuration is invalid: " . $e->getMessage());
         }
 
-
-        // merge custom data to config object
-        #######################################
-        // remove the dead lock
-        if (isset($data['parameters']['deadlock']) && $data['parameters']['deadlock'] == 'remove') {
-            unlink($dataDir . DIRECTORY_SEPARATOR . 'in' . DIRECTORY_SEPARATOR . 'state.json');
-        }
-
-        // load creds to state.json
-        $stateData = [];
-        if (file_exists('/data/out/state.json')) {
-            echo "CUSTOM MERGED FROM OUT";
-            $stateData = $this->loadStateFile($dataDir, 'out');
-        } else {
-            echo "CUSTOM MERGED FROM IN";
-            $stateData = $this->loadStateFile($dataDir);
-        }
-
-        if (isset($stateData['custom'])) {
-            $data['authorization']['oauth_api'] = $stateData['custom'];
-        }
-
-        #################################################3
-
         return $data;
     }
 
