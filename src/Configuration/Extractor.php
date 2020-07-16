@@ -82,13 +82,11 @@ class Extractor
         }
 
         // load creds to state.json
-        $stateOutFile = $dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'state.json';
+        $stateOutFile = '/data/out/state.json';
         $stateData = [];
         if (file_exists($stateOutFile)) {
-            echo "OUT State \n";
             $stateData = $this->loadStateFile($dataDir, 'out');
         } else {
-            echo "IN State \n";
             $stateData = $this->loadStateFile($dataDir);
         }
 
@@ -142,6 +140,11 @@ class Extractor
         } catch (InvalidConfigurationException $e) {
             // TODO: create issue to make this strict
             //$this->logger->warning("State file configuration is invalid: " . $e->getMessage());
+        }
+
+        if (count($data)) {
+            echo "STATE FILE";
+            echo $dataDir, $folder . DIRECTORY_SEPARATOR . 'state.json';
         }
 
         return $data;
