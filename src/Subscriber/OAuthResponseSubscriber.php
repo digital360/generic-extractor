@@ -45,10 +45,6 @@ class OAuthResponseSubscriber implements SubscriberInterface
             $data = $this->buildConfigArray();
             // update the out file
             file_put_contents('/data/out/state.json', json_encode(['custom' => $data]));
-
-            // update the in file
-            file_put_contents('/data/in/state.json', json_encode(['custom' => $data]));
-
             echo('TOKEN IS BEEN REFRESHED');
             echo("\n");
             print_r($this->_response_token);
