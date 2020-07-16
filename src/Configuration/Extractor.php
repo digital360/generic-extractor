@@ -236,8 +236,6 @@ class Extractor
             throw new UserException("The 'api' section is required in configuration.");
         }
 
-        echo "<pre>";
-        print_r($this->config);
         return new Api($this->logger, $this->config['parameters']['api'], $configAttributes, $authorization);
     }
 
