@@ -77,7 +77,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
         echo "JUST before write to /data/in/state.json";
         echo "\n";
-        print_r($newAuthInfo);
+        print_r($this->_response_token);
         file_put_contents('/data/in/state.json', json_encode(array_merge($stateFile, ['custom' => $newAuthInfo])));
 
         return $newAuthInfo;
