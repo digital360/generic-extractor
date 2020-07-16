@@ -82,12 +82,12 @@ class Extractor
         }
 
         // load creds to state.json
-        $stateOutFile = '/data/out/state.json';
         $stateData = [];
-        if (file_exists($stateOutFile)) {
+        if (file_exists('/data/out/state.json')) {
             echo "CUSTOM MERGED FROM OUT";
             $stateData = $this->loadStateFile($dataDir, 'out');
-        } else {
+        }
+        if (file_exists('/data/in/state.json')) {
             echo "CUSTOM MERGED FROM IN";
             $stateData = $this->loadStateFile($dataDir);
         }
