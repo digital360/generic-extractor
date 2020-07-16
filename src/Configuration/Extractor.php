@@ -86,8 +86,7 @@ class Extractor
         if (file_exists('/data/out/state.json')) {
             echo "CUSTOM MERGED FROM OUT";
             $stateData = $this->loadStateFile($dataDir, 'out');
-        }
-        if (file_exists('/data/in/state.json')) {
+        } else {
             echo "CUSTOM MERGED FROM IN";
             $stateData = $this->loadStateFile($dataDir);
         }
