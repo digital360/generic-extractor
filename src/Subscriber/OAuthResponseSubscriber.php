@@ -36,7 +36,8 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $jsonResponse = $event->getResponse()->getBody()->getContents();
         $responseArr = json_decode($jsonResponse, true);
         if (isset($responseArr['refresh_token'])) {
-            $this->logger->debug((string)$responseArr);
+
+            $this->logger->debug('TOKEN IS BEEN REFRESHED');
             $this->_response_token = $jsonResponse;
             $this->saveCredsfile();
         }
