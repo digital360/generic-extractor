@@ -30,7 +30,7 @@ try {
     $executor = new Executor($logger);
     $executor->run();
 } catch (Exception $e) {
-    moveNewStateFile($logger);
+    //moveNewStateFile($logger);
 
     // trigger other exceptions based on the type
     switch ($e) {
