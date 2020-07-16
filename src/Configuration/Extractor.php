@@ -54,8 +54,6 @@ class Extractor
         $this->config = $this->loadConfigFile($dataDir);
         $this->state = $this->loadStateFile($dataDir);
         $this->dataDir = $dataDir;
-        echo "STATE INFO";
-        echo json_encode($this->state, true);
     }
 
     /**
