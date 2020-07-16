@@ -9,7 +9,6 @@ use GuzzleHttp\Event\SubscriberInterface;
 use Keboola\GenericExtractor\Configuration\Extractor;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use Psr\Log\LoggerInterface;
 
 /**
  * Might better be able to work with ANY type of auth, and tweak the request accordingly
@@ -31,10 +30,6 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $jsonResponse = $event->getResponse()->getBody()->getContents();
         $responseArr = json_decode($jsonResponse, true);
         if (isset($responseArr['refresh_token'])) {
-
-            echo ('TOKEN IS BEEN REFRESHED');
-            echo ("\n");
-            print_r($jsonResponse);
             $this->_response_token = $jsonResponse;
             $this->saveCredsfile();
         }
@@ -49,10 +44,14 @@ class OAuthResponseSubscriber implements SubscriberInterface
         try {
             $data = $this->buildConfigArray();
             // update the out file
-            file_put_contents($dirPath . 'out' . DIRECTORY_SEPARATOR . 'state.json', json_encode(['custom' => $data]));
+            file_put_contents('/data/out/state.json', json_encode(['custom' => $data]));
 
             // update the in file
-            file_put_contents($dirPath . 'in' . DIRECTORY_SEPARATOR . 'state.json', json_encode(['custom' => $data]));
+            file_put_contents('/data/in/state.json', json_encode(['custom' => $data]));
+
+            echo('TOKEN IS BEEN REFRESHED');
+            echo("\n");
+            print_r($this->_response_token);
         } catch (\Exception $e) {
             throw new \RuntimeException('Cannot save new auth data');
         }

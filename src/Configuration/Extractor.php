@@ -280,6 +280,10 @@ class Extractor
         }
         ksort($filesWithTime);
 
+        echo "FILES LIST \n";
+        print_r($filesWithTime);
+        echo "\n";
+
         return end($filesWithTime);
     }
 
