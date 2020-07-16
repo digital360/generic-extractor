@@ -80,25 +80,6 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
         file_put_contents('/data/in/state.json', json_encode(array_merge($stateFile, ['custom' => $newAuthInfo])));
 
-
-        $configFile['authorization']['oauth_api'] = $newAuthInfo;
-
-        $client = new Client();
-        $r = $client->put(
-            'https://connection.keboola.com/v2/storage/components/engineroom.ex-generic/configs/603911685',
-            [
-                'headers' => [
-                    'content-type' => 'application/x-www-form-urlencoded',
-                    'X-StorageApi-Token' => $configFile['parameters']['componentToken'],
-                ],
-                'body' => 'configuration='.urlencode(json_encode($configFile)).'&changeDescription=Updated via api',
-            ]
-        );
-
-
-        echo $r->getBody()->getContents();
-
-
         return $newAuthInfo;
     }
 
