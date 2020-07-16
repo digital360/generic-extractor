@@ -93,6 +93,8 @@ class Extractor
 
         if (isset($stateData['custom'])) {
             $data['authorization']['oauth_api'] = $stateData['custom'];
+            echo 'line 96';
+            echo "\n";
         }
 
         #################################################3
