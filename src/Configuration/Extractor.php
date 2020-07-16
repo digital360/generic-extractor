@@ -144,20 +144,6 @@ class Extractor
             //$this->logger->warning("State file configuration is invalid: " . $e->getMessage());
         }
 
-        if (count($data)) {
-
-            // load creds to state.json
-            if ($stateFile == '/data/in/state.json') {
-                if (file_exists('/data/out/state.json')) {
-                    $stateData = $this->loadStateFile($dataDir, 'out');
-                    if (isset($stateData['custom'])) {
-                        echo "**** CUSTOM LOGIN MERGED";
-                        $data['authorization']['oauth_api'] = $stateData['custom'];
-                    }
-                }
-            }
-        }
-
         return $data;
     }
 

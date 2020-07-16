@@ -83,7 +83,6 @@ class Login implements AuthInterface
      */
     public function authenticateClient(RestClient $client)
     {
-        echo "authenticateClient metho \n";
         $loginRequest = $this->getAuthRequest($this->auth['loginRequest']);
         $sub = new LoginSubscriber();
 

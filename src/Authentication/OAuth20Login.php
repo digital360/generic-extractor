@@ -8,6 +8,7 @@ use Keboola\GenericExtractor\Subscriber\OAuthResponseSubscriber;
 use Keboola\Juicer\Client\RestClient;
 use Keboola\Juicer\Client\RestRequest;
 use Keboola\Utils\Exception\JsonDecodeException;
+use function Couchbase\defaultDecoder;
 
 /**
  * config:
@@ -102,6 +103,7 @@ class OAuth20Login extends Login
      */
     public function authenticateClient(RestClient $client)
     {
+        echo "authenticateClient method \n";
         // call login's method
         parent::authenticateClient($client);
         $client->getClient()->getEmitter()->attach(new OAuthResponseSubscriber());
