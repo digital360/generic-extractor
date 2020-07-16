@@ -84,10 +84,10 @@ class OAuth20Login extends Login
      */
     protected function getAuthRequest(array $config): RestRequest
     {
-        echo '\n';
+        echo "\n";
         echo "INSIDE getAuthRequest  \n";
         print_r($this->params);;
-        echo '\n';
+        echo "\n";
 
         if (!empty($config['params'])) {
             $config['params'] = UserFunction::build($config['params'], $this->params);

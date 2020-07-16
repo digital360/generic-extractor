@@ -48,7 +48,11 @@ class OAuthResponseSubscriber implements SubscriberInterface
             file_put_contents('/data/in/state.json', json_encode(['custom' => $data]));
             echo('TOKEN IS BEEN REFRESHED');
             echo("\n");
-            print_r($this->_response_token);
+            print_r($data);
+            echo("\n");
+            $a = file_get_contents('/data/in/state.json');
+            print_r($a);
+            echo "\n";
         } catch (\Exception $e) {
             throw new \RuntimeException('Cannot save new auth data');
         }
