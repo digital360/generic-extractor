@@ -30,6 +30,11 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $jsonResponse = $event->getResponse()->getBody()->getContents();
         $responseArr = json_decode($jsonResponse, true);
         if (isset($responseArr['refresh_token'])) {
+            echo "\n\n";
+            echo "INSIDE REFREH";
+            echo "\n\n";
+            print_r($responseArr);
+            echo "\n\n";
             $this->_response_token = $jsonResponse;
             $this->saveCredsfile();
         }
@@ -73,12 +78,31 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $authInfo = $configFile['authorization']['oauth_api']['credentials'];
         $newAuthData = ['#data' => $encryptedTokens];
 
-        $newAuthInfo = ['credentials' => array_merge($authInfo, $newAuthData)];
+        return ['credentials' => array_merge($authInfo, $newAuthData)];
+    }
 
-        echo "JUST before write to /data/in/state.json";
-        echo "\n";
-        print_r($this->_response_token);
-        file_put_contents('/data/in/state.json', json_encode(array_merge($stateFile, ['custom' => $newAuthInfo])));
+    public function updateConfig(array $configFile, $encryptedTokens){
+        $newAuthInfo = [
+            'credentials' => [
+                '#data'      => $encryptedTokens,
+                'appKey'     => $configFile['authorization']['oauth_api']['credentials']['appKey'],
+                '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
+            ],
+        ];
+
+        $configFile['authorization']['oauth_api']['credentials']['#data'] = $encryptedTokens;
+
+        $client = new Client();
+        $client->put(
+            'https://connection.keboola.com/v2/storage/components/' . getenv('KBC_COMPONENTID') . '/configs/' . getenv('KBC_CONFIGID'),
+            [
+                'headers' => [
+                    'content-type'       => 'application/x-www-form-urlencoded',
+                    'X-StorageApi-Token' => $configFile['parameters']['componentToken'],
+                ],
+                'body'    => 'configuration=' . urlencode(json_encode($configFile)) . '&changeDescription=Updated via api',
+            ]
+        );
 
         return $newAuthInfo;
     }
