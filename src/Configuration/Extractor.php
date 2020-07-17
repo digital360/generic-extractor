@@ -84,7 +84,7 @@ class Extractor
         // load creds from the latest file
         $stateData = [];
         if (file_exists('/data/in/auth.json')) {
-            $authData = $this->loadJSONFile($dataDir, 'auth.json');
+            $authData = $this->loadJSONFile($dataDir.'/in', 'auth.json');
             echo "DEBUG";
             print_r($authData);
             echo "\n";
