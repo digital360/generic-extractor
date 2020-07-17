@@ -91,7 +91,7 @@ class Extractor
 
         echo "CUSTOM AUTH";
         echo "\n";
-        print_r($stateData);
+        print_r(json_encode($stateData));
         echo "\n";
         echo "CUSTOM AUTH END";
         if (isset($stateData['custom'][0])) {
