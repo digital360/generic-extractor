@@ -82,24 +82,16 @@ class Extractor
         }
 
         // load creds from the latest file
-        $stateData = [];
-        if (file_exists('/data/in/state.json')) {
-            echo "IN State";
-            echo "\n";
-            $stateData = $this->loadStateFile($dataDir);
-        }
+        $stateData = $this->loadStateFile($dataDir);
 
         echo "CUSTOM AUTH";
         echo "\n";
-        print_r(json_encode($stateData));
+        print_r($stateData);
         echo "\n";
         echo "CUSTOM AUTH END";
-        if (isset($stateData['custom'][0])) {
-            $data = array_merge($data['authorization']['oauth_api']['credentials'], $stateData['custom'][0]);
+        if (isset($stateData['custom']['#data'])) {
+            $data['authorization']['oauth_api']['credentials']['#data'] = $stateData['custom']['#data'];
         }
-        echo "\n";
-        echo "\n";
-        print_r(json_encode($data));
         echo "\n";
         echo "\n";
 
@@ -252,7 +244,7 @@ class Extractor
     }
 
     /**
-     * @param  array  $data
+     * @param array $data
      */
     public function saveConfigMetadata(array $data)
     {
@@ -262,7 +254,7 @@ class Extractor
         }
 
         // pull custom data out of the file and merge back
-        $stateOutFile = $this->dataDir.DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'custom.json';
+        $stateOutFile = $this->dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'custom.json';
         if (file_exists($stateOutFile)) {
             $customData = json_decode(file_get_contents($stateOutFile), true);
             echo "HHHHH";
@@ -277,7 +269,7 @@ class Extractor
             }
         }
 
-        file_put_contents($dirPath.DIRECTORY_SEPARATOR.'state.json', json_encode($data));
+        file_put_contents($dirPath . DIRECTORY_SEPARATOR . 'state.json', json_encode($data));
     }
 
     public function latestConfigFile($dir)

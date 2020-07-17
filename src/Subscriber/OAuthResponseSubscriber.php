@@ -83,14 +83,14 @@ class OAuthResponseSubscriber implements SubscriberInterface
         echo json_encode($stateFile);
         echo "\n";
         echo "\n";
-       // $r = $this->updateStateFile($configFile, $stateFile);
+        $r = $this->updateStateFile($configFile, $stateFile);
 
         echo "\n";
         echo "\n";
         echo "STATE FILE UPDATED VIA API";
         echo "\n";
         echo "\n";
-       // echo $r;
+        echo $r;
         echo "\n";
         echo "\n";
 
