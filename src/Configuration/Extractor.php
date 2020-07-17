@@ -92,6 +92,8 @@ class Extractor
         echo "CUSTOM AUTH";
         echo "\n";
         print_r($stateData['custom']);
+        echo "\n";
+        echo "CUSTOM AUTH END";
         if (isset($stateData['custom'][0])) {
             $data = array_merge($data['authorization']['oauth_api']['credentials'], $stateData['custom'][0]);
         }
