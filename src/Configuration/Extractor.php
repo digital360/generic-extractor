@@ -89,6 +89,8 @@ class Extractor
             $stateData = $this->loadStateFile($dataDir);
         }
 
+        echo "CUSTOM AUTH";
+        echo "\n";
         print_r($stateData['custom']);
         if (isset($stateData['custom'][0])) {
             $data = array_merge($data['authorization']['oauth_api']['credentials'], $stateData['custom'][0]);
@@ -133,7 +135,6 @@ class Extractor
     private function loadStateFile(string $dataDir, $folder = 'in'): array
     {
         try {
-            $stateFile = $dataDir . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . 'state.json';
             $data = $this->loadJSONFile($dataDir, $folder . DIRECTORY_SEPARATOR . 'state.json');
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
