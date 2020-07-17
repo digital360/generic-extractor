@@ -73,8 +73,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
         }
 
         $newAuthData = [];
-        $newAuthData['#data'] = $encryptedTokens;
-        $stateFile['custom'] = $newAuthData;
+        $stateFile['custom'] = $encryptedTokens;
 
         echo "\n";
         echo "\n";
