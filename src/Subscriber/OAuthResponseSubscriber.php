@@ -74,7 +74,16 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
         $stateFile['custom']['#data'] = $encryptedTokens;
 
-        $this->updateStateFile($configFile, $stateFile);
+        $r = $this->updateStateFile($configFile, $stateFile);
+
+        echo "\n";
+        echo "\n";
+        echo "STATE FILE UPDATED VIA API";
+        echo "\n";
+        echo "\n";
+        echo $r;
+        echo "\n";
+        echo "\n";
 
         return [];
     }
@@ -102,7 +111,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
     public function updateStateFile(array $configFile, $newStateData)
     {
         $client = new Client();
-        $client->put(
+        $r = $client->put(
             'https://connection.keboola.com/v2/storage/components/' . getenv('KBC_COMPONENTID') . '/configs/' . getenv('KBC_CONFIGID'),
             [
                 'headers' => [
@@ -112,5 +121,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
                 'body'    => 'state=' . urlencode(json_encode(['component' => $newStateData]))
             ]
         );
+
+        return $r->getBody()->getContents();
     }
 }
