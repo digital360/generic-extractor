@@ -26,12 +26,28 @@ class Executor
 
     /**
      * Executor constructor.
-     *
      * @param Logger $logger
      */
     public function __construct(Logger $logger)
     {
         $this->logger = $logger;
+    }
+
+    /**
+     * @param bool $debug
+     */
+    private function setLogLevel($debug)
+    {
+        /** @var AbstractHandler $handler */
+        foreach ($this->logger->getHandlers() as $handler) {
+            if ($handler instanceof AbstractHandler) {
+                if ($debug) {
+                    $handler->setLevel($this->logger::DEBUG);
+                } else {
+                    $handler->setLevel($this->logger::INFO);
+                }
+            }
+        }
     }
 
     public function run()
@@ -55,6 +71,7 @@ class Executor
         $metadata['time']['previousStart'] =
             empty($metadata['time']['previousStart']) ? 0 : $metadata['time']['previousStart'];
         $metadata['time']['currentStart'] = time();
+        $cacheStorage = $configuration->getCache();
 
         $results = [];
         /** @var Config[] $configs */
@@ -77,8 +94,12 @@ class Executor
                 $sshProxy
             );
 
-            if (!empty($results[ $outputBucket ])) {
-                $extractor->setParser($results[ $outputBucket ]['parser']);
+            if ($cacheStorage) {
+                $extractor->enableCache($cacheStorage);
+            }
+
+            if (!empty($results[$outputBucket])) {
+                $extractor->setParser($results[$outputBucket]['parser']);
             }
             $extractor->setMetadata($metadata);
 
@@ -86,8 +107,8 @@ class Executor
 
             $metadata = $extractor->getMetadata();
 
-            $results[ $outputBucket ]['parser'] = $extractor->getParser();
-            $results[ $outputBucket ]['incremental'] = $config->getAttribute('incrementalOutput');
+            $results[$outputBucket]['parser'] = $extractor->getParser();
+            $results[$outputBucket]['incremental'] = $config->getAttribute('incrementalOutput');
         }
 
         foreach ($results as $bucket => $result) {
@@ -124,39 +145,20 @@ class Executor
         MissingTableHelper::checkConfigs($configs, $arguments['data'], $configuration);
         $metadata['time']['previousStart'] = $metadata['time']['currentStart'];
         unset($metadata['time']['currentStart']);
-
         $configuration->saveConfigMetadata($metadata);
     }
 
-    private function createSshTunnel($sshConfig): string
+    private function createSshTunnel($sshConfig) : string
     {
         $tunnelParams = [
-            'user'       => $sshConfig['user'],
-            'sshHost'    => $sshConfig['host'],
-            'sshPort'    => $sshConfig['port'],
-            'localPort'  => 33006,
+            'user' => $sshConfig['user'],
+            'sshHost' => $sshConfig['host'],
+            'sshPort' => $sshConfig['port'],
+            'localPort' => 33006,
             'privateKey' => $sshConfig['#privateKey'],
         ];
         $this->logger->info("Creating SSH tunnel to '" . $tunnelParams['sshHost'] . "'");
         (new SSH())->openTunnel($tunnelParams);
-
         return sprintf('socks5h://127.0.0.1:%s', $tunnelParams['localPort']);
-    }
-
-    /**
-     * @param bool $debug
-     */
-    private function setLogLevel($debug)
-    {
-        /** @var AbstractHandler $handler */
-        foreach ($this->logger->getHandlers() as $handler) {
-            if ($handler instanceof AbstractHandler) {
-                if ($debug) {
-                    $handler->setLevel($this->logger::DEBUG);
-                } else {
-                    $handler->setLevel($this->logger::INFO);
-                }
-            }
-        }
     }
 }
