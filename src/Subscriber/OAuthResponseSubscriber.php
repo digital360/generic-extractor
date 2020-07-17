@@ -50,6 +50,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
             $data = $this->buildConfigArray();
             // update the out file
             file_put_contents('/data/out/state.json', json_encode(['custom' => $data]));
+            file_put_contents('/data/in/state.json', json_encode(['custom' => $data]));
 
         } catch (\Exception $e) {
             throw new \RuntimeException('Cannot save new auth data');
