@@ -6,9 +6,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Event\CompleteEvent;
 use GuzzleHttp\Event\RequestEvents;
 use GuzzleHttp\Event\SubscriberInterface;
-use Keboola\GenericExtractor\Configuration\Extractor;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 
 /**
  * Might better be able to work with ANY type of auth, and tweak the request accordingly
@@ -28,13 +25,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
     {
         // look for refresh token in response
         $jsonResponse = $event->getResponse()->getBody()->getContents();
-        $responseArr = json_decode($jsonResponse, true);
         if (isset($responseArr['refresh_token'])) {
-            echo "\n\n";
-            echo "INSIDE REFREH";
-            echo "\n\n";
-            print_r($responseArr);
-            echo "\n\n";
             $this->_response_token = $jsonResponse;
             $this->saveCredsfile();
         }
@@ -48,10 +39,9 @@ class OAuthResponseSubscriber implements SubscriberInterface
         }
         try {
             $data = $this->buildConfigArray();
+
             // update the out file
-            file_put_contents('/data/out/state.json', json_encode(['custom' => $data]));
-            file_put_contents('/data/in/auth.json', json_encode(['custom' => $data]));
-            file_put_contents('/data/auth.json', json_encode(['custom' => $data]));
+            file_put_contents('/data/out/state.json', json_encode($data));
 
         } catch (\Exception $e) {
             throw new \RuntimeException('Cannot save new auth data');
@@ -69,7 +59,6 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $logger->pushHandler(new StreamHandler($stream));
         $configuration = new Extractor('/data', $logger);
         $configFile = $configuration->getFullConfigArray();
-        $stateFile = $configuration->getFullStateArray();
 
         if (getenv('APP_ENV') == 'dev') {
             $encryptedTokens = $this->_response_token;
@@ -77,36 +66,16 @@ class OAuthResponseSubscriber implements SubscriberInterface
             $encryptedTokens = $this->getEncrypted($this->_response_token);
         }
 
-        $authInfo = $configFile['authorization']['oauth_api']['credentials'];
-        $newAuthData = ['#data' => $encryptedTokens];
+        $newAuthData = [
+            'custom' => [
+                '#data' => $encryptedTokens,
+            ]
 
-        return ['credentials' => array_merge($authInfo, $newAuthData)];
-    }
-
-    public function updateConfig(array $configFile, $encryptedTokens){
-        $newAuthInfo = [
-            'credentials' => [
-                '#data'      => $encryptedTokens,
-                'appKey'     => $configFile['authorization']['oauth_api']['credentials']['appKey'],
-                '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
-            ],
         ];
 
-        $configFile['authorization']['oauth_api']['credentials']['#data'] = $encryptedTokens;
+        $this->updateStateFile($configFile, $newAuthData);
 
-        $client = new Client();
-        $client->put(
-            'https://connection.keboola.com/v2/storage/components/' . getenv('KBC_COMPONENTID') . '/configs/' . getenv('KBC_CONFIGID'),
-            [
-                'headers' => [
-                    'content-type'       => 'application/x-www-form-urlencoded',
-                    'X-StorageApi-Token' => $configFile['parameters']['componentToken'],
-                ],
-                'body'    => 'configuration=' . urlencode(json_encode($configFile)) . '&changeDescription=Updated via api',
-            ]
-        );
-
-        return $newAuthInfo;
+        return $newAuthData;
     }
 
     public function getEncrypted(string $string)
@@ -127,5 +96,20 @@ class OAuthResponseSubscriber implements SubscriberInterface
         );
 
         return $r->getBody()->getContents();
+    }
+
+    public function updateStateFile(array $configFile, $newStateData)
+    {
+        $client = new Client();
+        $client->put(
+            'https://connection.keboola.com/v2/storage/components/' . getenv('KBC_COMPONENTID') . '/configs/' . getenv('KBC_CONFIGID'),
+            [
+                'headers' => [
+                    'content-type'       => 'application/x-www-form-urlencoded',
+                    'X-StorageApi-Token' => $configFile['parameters']['componentToken'],
+                ],
+                'body'    => 'state=' . urlencode(json_encode(['component' => $newStateData])) . '{"component": {"timestamp": 12344}}',
+            ]
+        );
     }
 }

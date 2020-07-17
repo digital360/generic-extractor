@@ -83,36 +83,21 @@ class Extractor
 
         // load creds from the latest file
         $stateData = [];
-        if (file_exists('/data/in/auth.json')) {
-            $authData = $this->loadJSONFile($dataDir . '/in', 'auth.json');
-            echo "DEBUG";
-            print_r($authData);
+        if (file_exists('/data/in/state.json')) {
+            echo "IN State";
             echo "\n";
-            echo "\n";
-            if (isset($authData['custom'])) {
-                echo "AUTH State";
-                echo "\n";
-                $stateData = $authData;
-            }
-        } else {
-            if (file_exists('/data/in/state.json')) {
-                echo "IN State";
-                echo "\n";
-                $stateData = $this->loadStateFile($dataDir);
-            }
+            $stateData = $this->loadStateFile($dataDir);
         }
 
-        $stateOutFile = $this->latestConfigFile('/data');
-        echo "STATE FILE:";
-        echo "\n";
-        echo $stateOutFile;
-        echo "\n";
-
-
-        if (isset($stateData['custom'])) {
-            print_r($stateData['custom']);
-            $data['authorization']['oauth_api'] = $stateData['custom'];
+        print_r($stateData['custom']);
+        if (isset($stateData['custom'][0])) {
+            $data = array_merge($data['authorization']['oauth_api']['credentials'], $stateData['custom'][0]);
         }
+        echo "\n";
+        echo "\n";
+        print_r(json_encode($data));
+        echo "\n";
+        echo "\n";
 
         #################################################3
 
