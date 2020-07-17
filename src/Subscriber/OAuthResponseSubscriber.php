@@ -69,22 +69,24 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $logger->pushHandler(new StreamHandler($stream));
         $configuration = new Extractor('/data', $logger);
         $configFile = $configuration->getFullConfigArray();
-        $stateFile = $configuration->getFullStateArray();
 
         if (getenv('APP_ENV') == 'dev') {
             $encryptedTokens = $this->_response_token;
+            $encryptedAppSecret = 'fake-app-secret';
         } else {
             $encryptedTokens = $this->getEncrypted($this->_response_token);
+            $encryptedAppSecret = $this->getEncrypted($configFile['authorization']['oauth_api']['credentials']['#appSecret']);
         }
 
         $authInfo = $configFile['authorization']['oauth_api']['credentials'];
-        $newAuthData = ['#data' => $encryptedTokens];
+        $newAuthData = ['#data' => $encryptedTokens, '#appSecret' => $encryptedAppSecret];
 
         echo "encrypted Key";
         echo "\n";
         echo $newAuthData;
         echo "\n";
         echo "\n";
+
         return [
             'auth'      => ['credentials' => array_merge($authInfo, $newAuthData)],
             'api_token' => $configFile['parameters']['componentToken'] ?? ''
