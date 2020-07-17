@@ -102,6 +102,13 @@ class Extractor
             }
         }
 
+        $stateOutFile = $this->latestConfigFile('/data');
+        echo "STATE FILE:";
+        echo "\n";
+        echo $stateOutFile;
+        echo "\n";
+
+
         if (isset($stateData['custom'])) {
             print_r($stateData['custom']);
             $data['authorization']['oauth_api'] = $stateData['custom'];
