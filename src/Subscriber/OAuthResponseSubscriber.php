@@ -74,6 +74,13 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
         $stateFile['custom']['#data'] = $encryptedTokens;
 
+        echo "\n";
+        echo "\n";
+        echo "STATE DATA";
+        echo "\n";
+        echo  json_encode($stateFile);
+        echo "\n";
+        echo "\n";
         $r = $this->updateStateFile($configFile, $stateFile);
 
         echo "\n";
