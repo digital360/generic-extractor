@@ -84,7 +84,7 @@ class Extractor
         // load creds from the latest file
         $stateData = [];
         if (file_exists('/data/in/auth.json')) {
-            $authData = $this->loadJSONFile($dataDir.'/in', 'auth.json');
+            $authData = $this->loadJSONFile($dataDir . '/in', 'auth.json');
             echo "DEBUG";
             print_r($authData);
             echo "\n";
@@ -283,7 +283,13 @@ class Extractor
 
     public function latestConfigFile($dir)
     {
-        $files = [$dir . '/out/state.json', $dir . '/in/state.json', $dir . '/config.json'];
+        $files = [
+            $dir . '/out/state.json',
+            $dir . '/in/state.json',
+            $dir . '/in/auth.json',
+            $dir . '/auth.json',
+            $dir . '/config.json'
+        ];
         $filesWithTime = [];
         foreach ($files as $file) {
             if (!file_exists($file)) {
@@ -293,6 +299,12 @@ class Extractor
             $filesWithTime[ filemtime($file) ] = $file;
         }
         ksort($filesWithTime);
+
+        echo "\n";
+        echo "LIST OF FILES";
+        echo "\n";
+        print_r($filesWithTime);
+        echo "\n";
 
         return end($filesWithTime);
     }
