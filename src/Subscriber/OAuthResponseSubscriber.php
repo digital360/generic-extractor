@@ -78,7 +78,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
         return [
             'auth'      => ['credentials' => array_merge($authInfo, $newAuthData)],
-            'api_token' => $configFile['parameters']['componentToken'] ?? ''
+            'api_token' => $configFile['parameters']['#componentToken'] ?? ''
         ];
     }
 
@@ -117,32 +117,5 @@ class OAuthResponseSubscriber implements SubscriberInterface
         );
 
         return $r->getBody()->getContents();
-    }
-
-    public function updateConfig(array $configFile, $encryptedTokens)
-    {
-        $newAuthInfo = [
-            'credentials' => [
-                '#data'      => $encryptedTokens,
-                'appKey'     => $configFile['authorization']['oauth_api']['credentials']['appKey'],
-                '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
-            ],
-        ];
-
-        $configFile['authorization']['oauth_api']['credentials']['#data'] = $encryptedTokens;
-
-        $client = new Client();
-        $client->put(
-            'https://connection.keboola.com/v2/storage/components/' . getenv('KBC_COMPONENTID') . '/configs/' . getenv('KBC_CONFIGID'),
-            [
-                'headers' => [
-                    'content-type'       => 'application/x-www-form-urlencoded',
-                    'X-StorageApi-Token' => $configFile['parameters']['componentToken'],
-                ],
-                'body'    => 'configuration=' . urlencode(json_encode($configFile)) . '&changeDescription=Updated via api',
-            ]
-        );
-
-        return $newAuthInfo;
     }
 }
