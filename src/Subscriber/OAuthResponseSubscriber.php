@@ -81,12 +81,6 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $authInfo = $configFile['authorization']['oauth_api']['credentials'];
         $newAuthData = ['#data' => $encryptedTokens, '#appSecret' => $encryptedAppSecret];
 
-        echo "encrypted Key";
-        echo "\n";
-        echo $newAuthData;
-        echo "\n";
-        echo "\n";
-
         return [
             'auth'      => ['credentials' => array_merge($authInfo, $newAuthData)],
             'api_token' => $configFile['parameters']['componentToken'] ?? ''
