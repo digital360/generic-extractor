@@ -102,7 +102,6 @@ class GenericExtractor
             $this->api->getIgnoreErrors()
         );
 
-        echo "BEFORE AUTH \n";
         $this->api->getAuth()->authenticateClient($client);
         // Verbose Logging of all requests
         $client->getClient()->getEmitter()->attach(new LogRequest($this->logger));
