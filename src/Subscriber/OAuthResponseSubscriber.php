@@ -111,7 +111,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
         return $r->getBody()->getContents();
     }
 
-    public function updateStateFile(array $configFile, $newStateData)
+    public function updateStateFile(string $apiToken, $newStateData)
     {
         $client = new Client();
         $r = $client->put(
@@ -119,7 +119,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
             [
                 'headers' => [
                     'content-type'       => 'application/x-www-form-urlencoded',
-                    'X-StorageApi-Token' => $configFile['parameters']['componentToken'],
+                    'X-StorageApi-Token' => $apiToken,
                 ],
                 'body'    => 'state=' . urlencode(json_encode(['component' => $newStateData]))
             ]
