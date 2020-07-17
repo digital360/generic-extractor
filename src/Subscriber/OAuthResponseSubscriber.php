@@ -78,7 +78,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
         return [
             'auth'      => ['credentials' => array_merge($authInfo, $newAuthData)],
-            'api_token' => $configFile['parameters']['#componentToken'] ?? ''
+            'api_token' => $configFile['parameters']['#keboola_token'] ?? ''
         ];
     }
 
