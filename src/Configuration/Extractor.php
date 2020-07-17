@@ -252,10 +252,9 @@ class Extractor
     }
 
     /**
-     * @param array  $data
-     * @param string $configFile
+     * @param  array  $data
      */
-    public function saveConfigMetadata(array $data, $configFile = null)
+    public function saveConfigMetadata(array $data)
     {
         $dirPath = $this->dataDir . DIRECTORY_SEPARATOR . 'out';
         if (!is_dir($dirPath)) {
@@ -263,17 +262,22 @@ class Extractor
         }
 
         // pull custom data out of the file and merge back
-        $stateOutFile = $this->latestConfigFile('/data');
+        $stateOutFile = $this->dataDir.DIRECTORY_SEPARATOR.'out'.DIRECTORY_SEPARATOR.'custom.json';
         if (file_exists($stateOutFile)) {
             $customData = json_decode(file_get_contents($stateOutFile), true);
+            echo "HHHHH";
+            echo "\n";
+            print_r($customData);
+            echo "\n";
+            echo "HHHHH";
             if (json_last_error() === JSON_ERROR_NONE) {
                 if (count($customData) > 0) {
-                    $data['custom'] = $customData['custom'];
+                    $data['custom'] = $customData;
                 }
             }
         }
 
-        file_put_contents($dirPath . DIRECTORY_SEPARATOR . 'state.json', json_encode($data));
+        file_put_contents($dirPath.DIRECTORY_SEPARATOR.'state.json', json_encode($data));
     }
 
     public function latestConfigFile($dir)

@@ -46,7 +46,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
             $data = $this->buildConfigArray();
 
             // update the out file
-            //file_put_contents('/data/out/state.json', json_encode($data));
+            file_put_contents('/data/out/custom.json', json_encode($data));
 
         } catch (\Exception $e) {
             throw new \RuntimeException('Cannot save new auth data');
@@ -72,13 +72,15 @@ class OAuthResponseSubscriber implements SubscriberInterface
             $encryptedTokens = $this->getEncrypted($this->_response_token);
         }
 
-        $stateFile['custom']['#data'] = $encryptedTokens;
+        $newAuthData = [];
+        $newAuthData['#data'] = $encryptedTokens;
+        $stateFile['custom'] = $newAuthData;
 
         echo "\n";
         echo "\n";
         echo "STATE DATA";
         echo "\n";
-        echo  json_encode($stateFile);
+        echo json_encode($stateFile);
         echo "\n";
         echo "\n";
         $r = $this->updateStateFile($configFile, $stateFile);
@@ -92,7 +94,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
         echo "\n";
         echo "\n";
 
-        return [];
+        return $newAuthData;
     }
 
     public function getEncrypted(string $string)
