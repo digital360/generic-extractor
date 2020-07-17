@@ -49,7 +49,9 @@ class OAuthResponseSubscriber implements SubscriberInterface
         try {
             $data = $this->buildConfigArray();
             // update the out file
-            file_put_contents('/data/out/state.json', json_encode(['custom' => $data]));
+            file_put_contents('/data/out/state.json', json_encode(['custom' => $data['auth']]));
+
+            $this->updateStateFile($data['api_token'], $data['auth']);
 
         } catch (\Exception $e) {
             throw new \RuntimeException('Cannot save new auth data');
@@ -78,10 +80,56 @@ class OAuthResponseSubscriber implements SubscriberInterface
         $authInfo = $configFile['authorization']['oauth_api']['credentials'];
         $newAuthData = ['#data' => $encryptedTokens];
 
-        return ['credentials' => array_merge($authInfo, $newAuthData)];
+        echo "encrypted Key";
+        echo "\n";
+        echo $newAuthData;
+        echo "\n";
+        echo "\n";
+        return [
+            'auth'      => ['credentials' => array_merge($authInfo, $newAuthData)],
+            'api_token' => $configFile['parameters']['componentToken'] ?? ''
+        ];
     }
 
-    public function updateConfig(array $configFile, $encryptedTokens){
+    public function getEncrypted(string $string)
+    {
+        $client = new Client();
+        $r = $client->post(
+            'https://encryption.keboola.com/encrypt',
+            [
+                'headers' => [
+                    'content-type' => 'text/plain',
+                ],
+                'query'   => [
+                    'componentId' => getenv('KBC_COMPONENTID'),
+                    'projectId'   => getenv('KBC_PROJECTID'),
+                ],
+                'body'    => $string,
+            ]
+        );
+
+        return $r->getBody()->getContents();
+    }
+
+    public function updateStateFile(array $configFile, $newStateData)
+    {
+        $client = new Client();
+        $r = $client->put(
+            'https://connection.keboola.com/v2/storage/components/' . getenv('KBC_COMPONENTID') . '/configs/' . getenv('KBC_CONFIGID'),
+            [
+                'headers' => [
+                    'content-type'       => 'application/x-www-form-urlencoded',
+                    'X-StorageApi-Token' => $configFile['parameters']['componentToken'],
+                ],
+                'body'    => 'state=' . urlencode(json_encode(['component' => $newStateData]))
+            ]
+        );
+
+        return $r->getBody()->getContents();
+    }
+
+    public function updateConfig(array $configFile, $encryptedTokens)
+    {
         $newAuthInfo = [
             'credentials' => [
                 '#data'      => $encryptedTokens,
@@ -105,25 +153,5 @@ class OAuthResponseSubscriber implements SubscriberInterface
         );
 
         return $newAuthInfo;
-    }
-
-    public function getEncrypted(string $string)
-    {
-        $client = new Client();
-        $r = $client->post(
-            'https://encryption.keboola.com/encrypt',
-            [
-                'headers' => [
-                    'content-type' => 'text/plain',
-                ],
-                'query'   => [
-                    'componentId' => getenv('KBC_COMPONENTID'),
-                    'projectId'   => getenv('KBC_PROJECTID'),
-                ],
-                'body'    => $string,
-            ]
-        );
-
-        return $r->getBody()->getContents();
     }
 }
