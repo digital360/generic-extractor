@@ -6,6 +6,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Event\CompleteEvent;
 use GuzzleHttp\Event\RequestEvents;
 use GuzzleHttp\Event\SubscriberInterface;
+use Keboola\GenericExtractor\Configuration\Extractor;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 
 /**
  * Might better be able to work with ANY type of auth, and tweak the request accordingly
@@ -25,6 +28,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
     {
         // look for refresh token in response
         $jsonResponse = $event->getResponse()->getBody()->getContents();
+        $responseArr = json_decode($jsonResponse, true);
         if (isset($responseArr['refresh_token'])) {
             echo "\n\n";
             echo "INSIDE REFREH";
@@ -44,9 +48,8 @@ class OAuthResponseSubscriber implements SubscriberInterface
         }
         try {
             $data = $this->buildConfigArray();
-
             // update the out file
-            file_put_contents('/data/out/custom.json', json_encode($data));
+            file_put_contents('/data/out/state.json', json_encode(['custom' => $data]));
 
         } catch (\Exception $e) {
             throw new \RuntimeException('Cannot save new auth data');
@@ -72,28 +75,36 @@ class OAuthResponseSubscriber implements SubscriberInterface
             $encryptedTokens = $this->getEncrypted($this->_response_token);
         }
 
-        $newAuthData = [];
-        $stateFile['custom'] = $encryptedTokens;
+        $authInfo = $configFile['authorization']['oauth_api']['credentials'];
+        $newAuthData = ['#data' => $encryptedTokens];
 
-        echo "\n";
-        echo "\n";
-        echo "STATE DATA";
-        echo "\n";
-        echo json_encode($stateFile);
-        echo "\n";
-        echo "\n";
-        $r = $this->updateStateFile($configFile, $stateFile);
+        return ['credentials' => array_merge($authInfo, $newAuthData)];
+    }
 
-        echo "\n";
-        echo "\n";
-        echo "STATE FILE UPDATED VIA API";
-        echo "\n";
-        echo "\n";
-        echo $r;
-        echo "\n";
-        echo "\n";
+    public function updateConfig(array $configFile, $encryptedTokens){
+        $newAuthInfo = [
+            'credentials' => [
+                '#data'      => $encryptedTokens,
+                'appKey'     => $configFile['authorization']['oauth_api']['credentials']['appKey'],
+                '#appSecret' => $configFile['authorization']['oauth_api']['credentials']['#appSecret'],
+            ],
+        ];
 
-        return $newAuthData;
+        $configFile['authorization']['oauth_api']['credentials']['#data'] = $encryptedTokens;
+
+        $client = new Client();
+        $client->put(
+            'https://connection.keboola.com/v2/storage/components/' . getenv('KBC_COMPONENTID') . '/configs/' . getenv('KBC_CONFIGID'),
+            [
+                'headers' => [
+                    'content-type'       => 'application/x-www-form-urlencoded',
+                    'X-StorageApi-Token' => $configFile['parameters']['componentToken'],
+                ],
+                'body'    => 'configuration=' . urlencode(json_encode($configFile)) . '&changeDescription=Updated via api',
+            ]
+        );
+
+        return $newAuthInfo;
     }
 
     public function getEncrypted(string $string)
@@ -110,23 +121,6 @@ class OAuthResponseSubscriber implements SubscriberInterface
                     'projectId'   => getenv('KBC_PROJECTID'),
                 ],
                 'body'    => $string,
-            ]
-        );
-
-        return $r->getBody()->getContents();
-    }
-
-    public function updateStateFile(array $configFile, $newStateData)
-    {
-        $client = new Client();
-        $r = $client->put(
-            'https://connection.keboola.com/v2/storage/components/' . getenv('KBC_COMPONENTID') . '/configs/' . getenv('KBC_CONFIGID'),
-            [
-                'headers' => [
-                    'content-type'       => 'application/x-www-form-urlencoded',
-                    'X-StorageApi-Token' => $configFile['parameters']['componentToken'],
-                ],
-                'body'    => 'state=' . urlencode(json_encode(['component' => $newStateData]))
             ]
         );
 

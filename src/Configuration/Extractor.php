@@ -82,18 +82,17 @@ class Extractor
         }
 
         // load creds from the latest file
-        $stateData = $this->loadStateFile($dataDir);
-
-        echo "CUSTOM AUTH";
-        echo "\n";
-        print_r($stateData);
-        echo "\n";
-        echo "CUSTOM AUTH END";
-        if (isset($stateData['custom']['#data'])) {
-            $data['authorization']['oauth_api']['credentials']['#data'] = $stateData['custom']['#data'];
+        $stateData = [];
+        if (file_exists('/data/in/state.json')) {
+            echo "IN State";
+            echo "\n";
+            $stateData = $this->loadStateFile($dataDir);
         }
-        echo "\n";
-        echo "\n";
+
+        if (isset($stateData['custom'])) {
+            print_r($stateData['custom']);
+            $data['authorization']['oauth_api'] = $stateData['custom'];
+        }
 
         #################################################3
 
@@ -129,6 +128,7 @@ class Extractor
     private function loadStateFile(string $dataDir, $folder = 'in'): array
     {
         try {
+            $stateFile = $dataDir . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . 'state.json';
             $data = $this->loadJSONFile($dataDir, $folder . DIRECTORY_SEPARATOR . 'state.json');
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
@@ -244,9 +244,10 @@ class Extractor
     }
 
     /**
-     * @param array $data
+     * @param array  $data
+     * @param string $configFile
      */
-    public function saveConfigMetadata(array $data)
+    public function saveConfigMetadata(array $data, $configFile = null)
     {
         $dirPath = $this->dataDir . DIRECTORY_SEPARATOR . 'out';
         if (!is_dir($dirPath)) {
@@ -254,17 +255,12 @@ class Extractor
         }
 
         // pull custom data out of the file and merge back
-        $stateOutFile = $this->dataDir . DIRECTORY_SEPARATOR . 'out' . DIRECTORY_SEPARATOR . 'custom.json';
+        $stateOutFile = $this->latestConfigFile('/data');
         if (file_exists($stateOutFile)) {
             $customData = json_decode(file_get_contents($stateOutFile), true);
-            echo "HHHHH";
-            echo "\n";
-            print_r($customData);
-            echo "\n";
-            echo "HHHHH";
             if (json_last_error() === JSON_ERROR_NONE) {
                 if (count($customData) > 0) {
-                    $data['custom'] = $customData;
+                    $data['custom'] = $customData['custom'];
                 }
             }
         }
@@ -274,13 +270,7 @@ class Extractor
 
     public function latestConfigFile($dir)
     {
-        $files = [
-            $dir . '/out/state.json',
-            $dir . '/in/state.json',
-            $dir . '/in/auth.json',
-            $dir . '/auth.json',
-            $dir . '/config.json'
-        ];
+        $files = [$dir . '/out/state.json', $dir . '/in/state.json', $dir . '/config.json'];
         $filesWithTime = [];
         foreach ($files as $file) {
             if (!file_exists($file)) {
@@ -290,12 +280,6 @@ class Extractor
             $filesWithTime[ filemtime($file) ] = $file;
         }
         ksort($filesWithTime);
-
-        echo "\n";
-        echo "LIST OF FILES";
-        echo "\n";
-        print_r($filesWithTime);
-        echo "\n";
 
         return end($filesWithTime);
     }
