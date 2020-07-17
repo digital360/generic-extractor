@@ -113,7 +113,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
                     'content-type'       => 'application/x-www-form-urlencoded',
                     'X-StorageApi-Token' => $configFile['parameters']['componentToken'],
                 ],
-                'body'    => 'state=' . urlencode(json_encode(['component' => $newStateData])) . '{"component": {"timestamp": 12344}}',
+                'body'    => 'state=' . urlencode(json_encode(['component' => $newStateData]))
             ]
         );
     }
