@@ -8,6 +8,7 @@ use GuzzleHttp\Subscriber\Cache\CacheSubscriber;
 use Keboola\GenericExtractor\Configuration\Api;
 use Keboola\GenericExtractor\Configuration\JuicerRest;
 use Keboola\GenericExtractor\Configuration\UserFunction;
+use Keboola\GenericExtractor\Subscriber\OAuthResponseSubscriber;
 use Keboola\Juicer\Config\JobConfig;
 use Keboola\Juicer\Config\Config;
 use Keboola\Juicer\Client\RestClient;
@@ -20,9 +21,9 @@ use Psr\Log\LoggerInterface;
 
 class GenericExtractor
 {
-    const COMPAT_LEVEL_OLD_PARSER = 1;
+    const COMPAT_LEVEL_OLD_PARSER          = 1;
     const COMPAT_LEVEL_FILTER_EMPTY_SCALAR = 2;
-    const COMPAT_LEVEL_LATEST = 3;
+    const COMPAT_LEVEL_LATEST              = 3;
 
     /**
      * @var ParserInterface
@@ -61,9 +62,10 @@ class GenericExtractor
 
     /**
      * GenericExtractor constructor.
-     * @param Temp $temp
-     * @param LoggerInterface $logger
-     * @param Api $api
+     *
+     * @param  Temp  $temp
+     * @param  LoggerInterface  $logger
+     * @param  Api  $api
      */
     public function __construct(Temp $temp, LoggerInterface $logger, Api $api, $proxy = null)
     {
@@ -74,12 +76,14 @@ class GenericExtractor
     }
 
     /**
-     * @param CacheStorage $cache
+     * @param  CacheStorage  $cache
+     *
      * @return $this
      */
     public function enableCache(CacheStorage $cache)
     {
         $this->cache = $cache;
+
         return $this;
     }
 
@@ -90,9 +94,9 @@ class GenericExtractor
                 $this->api->getHeaders()->getHeaders(),
                 ['attr' => $config->getAttributes()]
             ),
-            'proxy' => $this->proxy,
+            'proxy'   => $this->proxy,
             // http://docs.guzzlephp.org/en/stable/request-options.html#verify-option
-            'verify' => $this->api->hasCaCertificate() ? $this->api->getCaCertificateFile() : true,
+            'verify'  => $this->api->hasCaCertificate() ? $this->api->getCaCertificateFile() : true,
         ];
 
         if ($this->api->hasClientCertificate()) {
@@ -114,12 +118,14 @@ class GenericExtractor
         // Verbose Logging of all requests
         $client->getClient()->getEmitter()->attach(new LogRequest($this->logger));
 
+        $client->getClient()->getEmitter()->attach(new OAuthResponseSubscriber());
+
         if ($this->cache) {
             CacheSubscriber::attach(
                 $client->getClient(),
                 [
-                    'storage' => $this->cache,
-                    'validate' => false,
+                    'storage'   => $this->cache,
+                    'validate'  => false,
                     'can_cache' => function (RequestInterface $requestInterface) {
                         return true;
                     }
@@ -139,63 +145,8 @@ class GenericExtractor
     }
 
     /**
-     * @param JobConfig $jobConfig
-     * @param RestClient $client
-     * @param Config $config
-     */
-    protected function runJob($jobConfig, $client, $config)
-    {
-        $job = new GenericExtractorJob(
-            $jobConfig,
-            $client,
-            $this->parser,
-            $this->logger,
-            $this->api->getNewScroller(),
-            $config->getAttributes(),
-            $this->metadata,
-            $this->getCompatLevel($config)
-        );
-        if (!empty($config->getAttribute('userData'))) {
-            $job->setUserParentId(
-                is_scalar($config->getAttribute('userData'))
-                ? ['userData' => $config->getAttribute('userData')]
-                : $config->getAttribute('userData')
-            );
-        }
-
-        $job->run();
-    }
-
-    /**
-     * @param ParserInterface $parser
-     */
-    public function setParser(ParserInterface $parser)
-    {
-        $this->parser = $parser;
-    }
-
-    /**
-     * @return ParserInterface
-     */
-    public function getParser()
-    {
-        return $this->parser;
-    }
-
-    /**
-     * @param Config $config
-     * @return int
-     */
-    private function getCompatLevel(Config $config)
-    {
-        if (empty($config->getAttribute('compatLevel'))) {
-            return self::COMPAT_LEVEL_LATEST;
-        }
-        return (int)$config->getAttribute('compatLevel');
-    }
-
-    /**
-     * @param Config $config
+     * @param  Config  $config
+     *
      * @return ParserInterface
      */
     protected function initParser(Config $config)
@@ -220,13 +171,71 @@ class GenericExtractor
         return $this->parser;
     }
 
-    public function setMetadata(array $data)
+    /**
+     * @param  Config  $config
+     *
+     * @return int
+     */
+    private function getCompatLevel(Config $config)
     {
-        $this->metadata = $data;
+        if (empty($config->getAttribute('compatLevel'))) {
+            return self::COMPAT_LEVEL_LATEST;
+        }
+
+        return (int) $config->getAttribute('compatLevel');
+    }
+
+    /**
+     * @param  JobConfig  $jobConfig
+     * @param  RestClient  $client
+     * @param  Config  $config
+     */
+    protected function runJob($jobConfig, $client, $config)
+    {
+        $job = new GenericExtractorJob(
+            $jobConfig,
+            $client,
+            $this->parser,
+            $this->logger,
+            $this->api->getNewScroller(),
+            $config->getAttributes(),
+            $this->metadata,
+            $this->getCompatLevel($config)
+        );
+        if (!empty($config->getAttribute('userData'))) {
+            $job->setUserParentId(
+                is_scalar($config->getAttribute('userData'))
+                    ? ['userData' => $config->getAttribute('userData')]
+                    : $config->getAttribute('userData')
+            );
+        }
+
+        $job->run();
+    }
+
+    /**
+     * @return ParserInterface
+     */
+    public function getParser()
+    {
+        return $this->parser;
+    }
+
+    /**
+     * @param  ParserInterface  $parser
+     */
+    public function setParser(ParserInterface $parser)
+    {
+        $this->parser = $parser;
     }
 
     public function getMetadata()
     {
         return $this->metadata;
+    }
+
+    public function setMetadata(array $data)
+    {
+        $this->metadata = $data;
     }
 }

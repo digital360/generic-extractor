@@ -50,7 +50,6 @@ class Extractor
      */
     public function __construct(string $dataDir, LoggerInterface $logger)
     {
-        echo "*** Always Running *** \n";
         $this->logger = $logger;
         $this->config = $this->loadConfigFile($dataDir);
         $this->state = $this->loadStateFile($dataDir);

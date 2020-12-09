@@ -8,7 +8,8 @@ use Keboola\GenericExtractor\Subscriber\OAuthResponseSubscriber;
 use Keboola\Juicer\Client\RestClient;
 use Keboola\Juicer\Client\RestRequest;
 use Keboola\Utils\Exception\JsonDecodeException;
-use function Couchbase\defaultDecoder;
+
+use function Keboola\Utils\jsonDecode;
 
 /**
  * config:
@@ -41,9 +42,9 @@ class OAuth20Login extends Login
     /**
      * OAuth20Login constructor.
      *
-     * @param array $configAttributes
-     * @param array $authorization
-     * @param array $authentication
+     * @param  array  $configAttributes
+     * @param  array  $authorization
+     * @param  array  $authentication
      *
      * @throws UserException
      */
@@ -56,13 +57,13 @@ class OAuth20Login extends Login
 
         $oauthApiDetails = $authorization['oauth_api']['credentials'];
         foreach (['#data', 'appKey', '#appSecret'] as $key) {
-            if (empty($oauthApiDetails[ $key ])) {
+            if (empty($oauthApiDetails[$key])) {
                 throw new UserException("Missing '{$key}' for OAuth 2.0 authorization");
             }
         }
 
         try {
-            $oAuthData = \Keboola\Utils\jsonDecode($oauthApiDetails['#data'], true);
+            $oAuthData = jsonDecode($oauthApiDetails['#data'], true);
         } catch (JsonDecodeException $e) {
             throw new UserException("The OAuth data is not a valid JSON");
         }
@@ -92,15 +93,5 @@ class OAuth20Login extends Login
         }
 
         return new RestRequest($config);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function authenticateClient(RestClient $client)
-    {
-        // call login's method
-        $client->getClient()->getEmitter()->attach(new OAuthResponseSubscriber());
-        parent::authenticateClient($client);
     }
 }

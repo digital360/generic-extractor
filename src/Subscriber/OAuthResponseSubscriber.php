@@ -4,6 +4,7 @@ namespace Keboola\GenericExtractor\Subscriber;
 
 use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Event\BeforeEvent;
 use GuzzleHttp\Event\CompleteEvent;
 use GuzzleHttp\Event\RequestEvents;
 use GuzzleHttp\Event\SubscriberInterface;
@@ -18,12 +19,13 @@ use RuntimeException;
 class OAuthResponseSubscriber implements SubscriberInterface
 {
 
-    private $logger;
     private $_response_token;
 
     public function getEvents()
     {
-        return ['complete' => ['onComplete', RequestEvents::LATE]];
+        return [
+            'complete' => ['onComplete', RequestEvents::LATE]
+        ];
     }
 
     public function onComplete(CompleteEvent $event)
