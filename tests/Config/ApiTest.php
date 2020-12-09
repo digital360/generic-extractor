@@ -51,13 +51,20 @@ class ApiTest extends TestCase
         self::assertEquals($string, $api->getBaseUrl());
     }
 
+    public function testCreateBaseUrlStringWithUnderscore()
+    {
+        $string = 'https://foo_export.test.example.com';
+        $api = new Api(new NullLogger(), ['baseUrl' => $string], [], []);
+        self::assertEquals($string, $api->getBaseUrl());
+    }
+
     public function testCreateInvalidUrlString()
     {
         try {
             new Api(new NullLogger(), ['baseUrl' => 'htt//this is not valid'], [], []);
             self::fail("Invalid URL must fail");
         } catch (UserException $e) {
-            self::assertContains('is not a valid URL', $e->getMessage());
+            self::assertStringContainsString('is not a valid URL', $e->getMessage());
         }
     }
 
@@ -75,9 +82,6 @@ class ApiTest extends TestCase
         self::assertEquals('https://keboola.example.com/', $api->getBaseUrl());
     }
 
-    /**
-     * @expectedException \Keboola\GenericExtractor\Exception\UserException
-     */
     public function testCreateBaseUrlFunctionError()
     {
         $fn = [
@@ -87,6 +91,7 @@ class ApiTest extends TestCase
                 (object) ['attr' => 'path']
             ]
         ];
+        $this->expectException(UserException::class);
         new Api(new NullLogger(), ['baseUrl' => $fn], [], []);
     }
 
@@ -194,6 +199,20 @@ class ApiTest extends TestCase
         self::assertTrue($api->hasCaCertificate());
         self::assertSame($crtContent, $api->getCaCertificate());
         self::assertSame($crtContent, file_get_contents($api->getCaCertificateFile()));
+    }
+
+    public function testCustomClientCertificate()
+    {
+        $crtContent = "-----BEGIN CERTIFICATE-----\nMIIFazCCA1OgAwIBAgIUGzl\n....\n-----END CERTIFICATE-----\n-----BEGIN RSA PRIVATE KEY-----\nMIIFazCCA1OgAwIBAgIUGzl\n-----END RSA PRIVATE KEY-----";
+        $apiConfig = [
+            'baseUrl' => 'http://example.com',
+            '#clientCertificate' => $crtContent,
+        ];
+
+        $api = new Api(new NullLogger(), $apiConfig, [], []);
+        self::assertTrue($api->hasClientCertificate());
+        self::assertSame($crtContent, $api->getClientCertificate());
+        self::assertSame($crtContent, file_get_contents($api->getClientCertificateFile()));
     }
 
     public function testInvalidFunctionBaseUrlThrowsUserException()
