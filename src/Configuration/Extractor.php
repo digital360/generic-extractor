@@ -50,6 +50,7 @@ class Extractor
      */
     public function __construct(string $dataDir, LoggerInterface $logger)
     {
+        echo "*** Always Running *** \n";
         $this->logger = $logger;
         $this->config = $this->loadConfigFile($dataDir);
         $this->state = $this->loadStateFile($dataDir);
@@ -84,6 +85,10 @@ class Extractor
         // load creds from the latest file
         $stateData = [];
         if (file_exists('/data/in/state.json')) {
+            $stateData = $this->loadStateFile($dataDir);
+        }
+
+        if (file_exists('/data/out/state.json')) {
             $stateData = $this->loadStateFile($dataDir);
         }
 
@@ -126,6 +131,7 @@ class Extractor
     {
         try {
             $stateFile = $dataDir . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . 'state.json';
+            echo $stateFile."\n";
             $data = $this->loadJSONFile($dataDir, $folder . DIRECTORY_SEPARATOR . 'state.json');
         } catch (ApplicationException $e) {
             // state file is optional so only log the error
@@ -267,6 +273,7 @@ class Extractor
 
     public function latestConfigFile($dir)
     {
+        echo "***** Latest config ****";
         $files = [$dir . '/out/state.json', $dir . '/in/state.json', $dir . '/config.json'];
         $filesWithTime = [];
         foreach ($files as $file) {
