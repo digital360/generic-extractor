@@ -2,6 +2,7 @@
 
 namespace Keboola\GenericExtractor\Subscriber;
 
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Event\CompleteEvent;
 use GuzzleHttp\Event\RequestEvents;
@@ -9,6 +10,7 @@ use GuzzleHttp\Event\SubscriberInterface;
 use Keboola\GenericExtractor\Configuration\Extractor;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use RuntimeException;
 
 /**
  * Might better be able to work with ANY type of auth, and tweak the request accordingly
@@ -37,7 +39,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
     private function saveCredsfile()
     {
-        $dirPath = '/data' . DIRECTORY_SEPARATOR;
+        $dirPath = '/data'.DIRECTORY_SEPARATOR;
         if (!is_dir($dirPath)) {
             mkdir($dirPath);
         }
@@ -47,9 +49,8 @@ class OAuthResponseSubscriber implements SubscriberInterface
             file_put_contents('/data/out/state.json', json_encode(['custom' => $data['auth']]));
 
             $this->updateStateFile($data['api_token'], $data['auth']);
-
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Cannot save new auth data');
+        } catch (Exception $e) {
+            throw new RuntimeException('Cannot save new auth data');
         }
     }
 
@@ -106,13 +107,13 @@ class OAuthResponseSubscriber implements SubscriberInterface
     {
         $client = new Client();
         $r = $client->put(
-            'https://connection.keboola.com/v2/storage/components/' . getenv('KBC_COMPONENTID') . '/configs/' . getenv('KBC_CONFIGID'),
+            'https://connection.keboola.com/v2/storage/components/'.getenv('KBC_COMPONENTID').'/configs/'.getenv('KBC_CONFIGID'),
             [
                 'headers' => [
                     'content-type'       => 'application/x-www-form-urlencoded',
                     'X-StorageApi-Token' => $apiToken,
                 ],
-                'body'    => 'state=' . urlencode(json_encode(['component' => ['custom' => $newStateData]]))
+                'body'    => 'state='.urlencode(json_encode(['component' => ['custom' => $newStateData]]))
             ]
         );
 

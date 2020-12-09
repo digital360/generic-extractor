@@ -9,6 +9,11 @@ use Keboola\Juicer\Client\RestClient;
 use Keboola\Juicer\Client\RestRequest;
 use Keboola\Utils\Exception\NoDataFoundException;
 
+use stdClass;
+
+use function Keboola\Utils\getDataFromPath;
+use function Keboola\Utils\objectToArray;
+
 /**
  * config:
  *
@@ -44,8 +49,8 @@ class Login implements AuthInterface
     /**
      * Login constructor.
      *
-     * @param array $configAttributes
-     * @param array $authentication
+     * @param  array  $configAttributes
+     * @param  array  $authentication
      *
      * @throws UserException
      */
@@ -72,7 +77,7 @@ class Login implements AuthInterface
                 && empty($authentication['expires']['response']))
         ) {
             throw new UserException(
-                "The 'expires' attribute must be either an integer or an array with 'response' " .
+                "The 'expires' attribute must be either an integer or an array with 'response' ".
                 "key containing a path in the response"
             );
         }
@@ -94,10 +99,10 @@ class Login implements AuthInterface
                 if ($this->format == 'json') {
                     $response = $client->getObjectFromResponse($rawResponse);
                     if (is_scalar($response)) {
-                        $response = (object)['data' => $response];
+                        $response = (object) ['data' => $response];
                     }
                 } else {
-                    $response = (object)['data' => (string)$rawResponse->getBody()];
+                    $response = (object) ['data' => (string) $rawResponse->getBody()];
                 }
                 $client->getClient()->getEmitter()->attach($sub);
 
@@ -113,7 +118,7 @@ class Login implements AuthInterface
     }
 
     /**
-     * @param array $config
+     * @param  array  $config
      *
      * @return RestRequest
      * @throws UserException
@@ -133,27 +138,27 @@ class Login implements AuthInterface
     /**
      * Maps data from login result into $type (header/query)
      *
-     * @param \stdClass $response
-     * @param string    $type
+     * @param  \stdClass  $response
+     * @param  string  $type
      *
      * @return array
      * @throws UserException
      */
-    protected function getResults(\stdClass $response, $type): array
+    protected function getResults(stdClass $response, $type): array
     {
         $result = [];
-        if (!empty($this->auth['apiRequest'][ $type ])) {
+        if (!empty($this->auth['apiRequest'][$type])) {
             $result = UserFunction::build(
-                $this->auth['apiRequest'][ $type ],
+                $this->auth['apiRequest'][$type],
                 [
-                    'response' => \Keboola\Utils\objectToArray($response),
+                    'response' => objectToArray($response),
                     'attr'     => $this->configAttributes
                 ]
             );
             // for backward compatibility, check the values if they are a valid path within the response
             foreach ($result as $key => $value) {
                 try {
-                    $result[ $key ] = \Keboola\Utils\getDataFromPath($value, $response, '.', false);
+                    $result[$key] = getDataFromPath($value, $response, '.', false);
                 } catch (NoDataFoundException $e) {
                     // silently ignore invalid paths as they are probably values already processed by functions
                 }
@@ -164,19 +169,19 @@ class Login implements AuthInterface
     }
 
     /**
-     * @param \stdClass $response
+     * @param  \stdClass  $response
      *
      * @return int|null
      * @throws UserException
      */
-    protected function getExpiry(\stdClass $response): ?int
+    protected function getExpiry(stdClass $response): ?int
     {
         if (!isset($this->auth['expires'])) {
             return null;
         } elseif (is_numeric($this->auth['expires'])) {
-            return time() + (int)$this->auth['expires'];
+            return time() + (int) $this->auth['expires'];
         } elseif (is_array($this->auth['expires'])) {
-            $rExpiry = \Keboola\Utils\getDataFromPath($this->auth['expires']['response'], $response, '.');
+            $rExpiry = getDataFromPath($this->auth['expires']['response'], $response, '.');
             $expiry = is_int($rExpiry) ? $rExpiry : strtotime($rExpiry);
 
             if (!empty($this->auth['expires']['relative'])) {
