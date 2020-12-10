@@ -23,9 +23,7 @@ class OAuthResponseSubscriber implements SubscriberInterface
 
     public function getEvents()
     {
-        return [
-            'complete' => ['onComplete', RequestEvents::LATE]
-        ];
+        return ['complete' => ['onComplete', RequestEvents::LATE]];
     }
 
     public function onComplete(CompleteEvent $event)
