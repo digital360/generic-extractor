@@ -87,7 +87,7 @@ class Extractor
             $stateData = $this->loadStateFile($dataDir);
         }
 
-        if (file_exists('/data/in/state.json')) {
+        if (file_exists('/data/out/state.json')) {
             $stateData = $this->loadStateFile($dataDir, 'out');
         }
 
@@ -129,6 +129,7 @@ class Extractor
      */
     private function loadStateFile(string $dataDir, $folder = 'in'): array
     {
+        $stateFile = '';
         try {
             $stateFile = $dataDir.DIRECTORY_SEPARATOR.$folder.DIRECTORY_SEPARATOR.'state.json';
             $data = $this->loadJSONFile($dataDir, $folder.DIRECTORY_SEPARATOR.'state.json');
