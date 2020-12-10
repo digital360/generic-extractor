@@ -169,23 +169,30 @@ class GenericExtractorJob
 
 
             $count = 0;
+            $childJobs = [];
             foreach ($data as $k => $result) {
                 $count++;
                 if (!empty($filter) && ($filter->compareObject((object) $result) == false)) {
                     continue;
                 }
 
-                if ($placeholderCount == $count) {
-                    // Add current result to the beginning of an array, containing all parent results
-                    $parentResults = $this->parentResults;
+                // Add current result to the beginning of an array, containing all parent results
+                $parentResults = $this->parentResults;
 
-                    if ($placeholderCount == 1) {
-                        array_unshift($parentResults, $result);
-                    } else {
-                        array_unshift($parentResults, array_slice($data, ($count-$placeholderCount), $placeholderCount));
+                if ($placeholderCount <= 1) {
+                    array_unshift($parentResults, $result);
+
+                    $childJobs = $this->createChild($child, $parentResults);
+                    // run child jobs
+                    foreach ($childJobs as $childJob) {
+                        $childJob->run();
                     }
+                }
 
+                if ($count % $placeholderCount === 0) {
+                    array_unshift($parentResults, array_slice($data, ($count - $placeholderCount), $placeholderCount));
                     $childJobs = $this->createChild($child, $parentResults[0]);
+                    // run child jobs
                     foreach ($childJobs as $childJob) {
                         $childJob->run();
                     }
