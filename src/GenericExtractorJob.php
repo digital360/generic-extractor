@@ -167,11 +167,13 @@ class GenericExtractorJob
             // place holder count
             $placeholderCount = count(!empty($child->getConfig()['placeholders']) ? $child->getConfig()['placeholders'] : []);
 
-
             $count = 0;
-            $childJobs = [];
+            $totalRecords = count($data);
+            $batch = 0;
             foreach ($data as $k => $result) {
+                // increase the counter
                 $count++;
+
                 if (!empty($filter) && ($filter->compareObject((object) $result) == false)) {
                     continue;
                 }
@@ -187,15 +189,30 @@ class GenericExtractorJob
                     foreach ($childJobs as $childJob) {
                         $childJob->run();
                     }
+                    continue;
                 }
 
-                if ($count % $placeholderCount === 0) {
-                    array_unshift($parentResults, array_slice($data, ($count - $placeholderCount), $placeholderCount));
+                // count left over
+                $leftOver = ($totalRecords - ($placeholderCount * $batch));
+                if ($count % $placeholderCount === 0 || $leftOver < $placeholderCount) {
+                    $batch++;
+
+                    $length = $placeholderCount;
+                    if ($leftOver < $placeholderCount) {
+                        $length = $leftOver;
+                    }
+
+                    $offset = ($count - $length);
+
+                    array_unshift($parentResults, array_slice($data, $offset, $length));
+
                     $childJobs = $this->createChild($child, $parentResults[0]);
                     // run child jobs
                     foreach ($childJobs as $childJob) {
                         $childJob->run();
                     }
+
+                    continue;
                 }
             }
         }
