@@ -245,7 +245,10 @@ class GenericExtractorJob
         echo "Length: $length \n";
 
         if ($length > 0 && $length < $placeholderCount) {
-            $placeholders = array_slice($placeholders, 0, $length);
+            //b46db129-5420-4e74-bfd5-23bf070ce64b
+            //00000000-0000-0000-0000-000000000000
+            $dummyValues[] = array_fill(0, $placeholderCount,'00000000-0000-0000-0000-000000000000');
+            $placeholders = array_merge($dummyValues,array_slice($placeholders, 0, $length));
             echo "*********";
             print_r($placeholders);
         }
