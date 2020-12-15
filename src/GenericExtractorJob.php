@@ -227,7 +227,7 @@ class GenericExtractorJob
      *
      * @return static[]
      */
-    private function createChild(JobConfig $config, array $parentResults, $length=0): array
+    private function createChild(JobConfig $config, array $parentResults, $length = 0): array
     {
         // Clone and reset Scroller
         $scroller = clone $this->scroller;
@@ -247,8 +247,8 @@ class GenericExtractorJob
         if ($length > 0 && $length < $placeholderCount) {
             //b46db129-5420-4e74-bfd5-23bf070ce64b
             //00000000-0000-0000-0000-000000000000
-            $dummyValues[] = array_fill(0, $placeholderCount,'00000000-0000-0000-0000-000000000000');
-            $placeholders = array_merge($dummyValues,array_slice($placeholders, 0, $length));
+            $dummyValues = array_fill(0, $placeholderCount, '00000000-0000-0000-0000-000000000000');
+            $placeholders = array_merge($dummyValues, array_slice($placeholders, 0, $length));
             echo "*********";
             print_r($placeholders);
         }
