@@ -181,7 +181,10 @@ class GenericExtractorJob
                 // Add current result to the beginning of an array, containing all parent results
                 $parentResults = $this->parentResults;
 
-                if ($placeholderCount <= 1) {
+                // count left over
+                $leftOver = ($totalRecords - ($placeholderCount * $batch));
+
+                if ($placeholderCount <= 1 || $leftOver < $placeholderCount) {
                     array_unshift($parentResults, $result);
 
                     $childJobs = $this->createChild($child, $parentResults);
@@ -192,26 +195,18 @@ class GenericExtractorJob
                     continue;
                 }
 
-                // count left over
-                $leftOver = ($totalRecords - ($placeholderCount * $batch));
-                if ($count % $placeholderCount === 0 || $leftOver < $placeholderCount) {
+                if ($count % $placeholderCount === 0) {
                     $batch++;
 
                     $length = $placeholderCount;
-                    if ($leftOver < $placeholderCount) {
-                        $length = $leftOver;
-                    }
-
                     $offset = ($count - $length);
-
                     array_unshift($parentResults, array_slice($data, $offset, $length));
 
-                    $childJobs = $this->createChild($child, $parentResults[0], $length);
+                    $childJobs = $this->createChild($child, $parentResults[0]);
                     // run child jobs
                     foreach ($childJobs as $childJob) {
                         $childJob->run();
                     }
-
                     continue;
                 }
             }
@@ -223,11 +218,10 @@ class GenericExtractorJob
      *
      * @param  JobConfig  $config
      * @param  array  $parentResults
-     * @param  int  $length
      *
      * @return static[]
      */
-    private function createChild(JobConfig $config, array $parentResults, $length = 0): array
+    private function createChild(JobConfig $config, array $parentResults): array
     {
         // Clone and reset Scroller
         $scroller = clone $this->scroller;
@@ -237,20 +231,6 @@ class GenericExtractorJob
         $placeholders = !empty($config->getConfig()['placeholders']) ? $config->getConfig()['placeholders'] : [];
         if (empty($placeholders)) {
             $this->logger->warning("No 'placeholders' set for '".$config->getConfig()['endpoint']."'");
-        }
-
-        $placeholderCount = count($placeholders);
-
-        echo "PlaceholderCount: $placeholderCount \n";
-        echo "Length: $length \n";
-
-        if ($length > 0 && $length < $placeholderCount) {
-            //b46db129-5420-4e74-bfd5-23bf070ce64b
-            //00000000-0000-0000-0000-000000000000
-            $dummyValues = array_fill(0, $placeholderCount, '00000000-0000-0000-0000-000000000000');
-            $placeholders = array_merge($dummyValues, array_slice($placeholders, 0, $length));
-            echo "*********";
-            print_r($placeholders);
         }
 
         foreach ($placeholders as $placeholder => $field) {
