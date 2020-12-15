@@ -206,7 +206,7 @@ class GenericExtractorJob
 
                     array_unshift($parentResults, array_slice($data, $offset, $length));
 
-                    $childJobs = $this->createChild($child, $parentResults[0]);
+                    $childJobs = $this->createChild($child, $parentResults[0], $length);
                     // run child jobs
                     foreach ($childJobs as $childJob) {
                         $childJob->run();
@@ -223,10 +223,11 @@ class GenericExtractorJob
      *
      * @param  JobConfig  $config
      * @param  array  $parentResults
+     * @param  int  $length
      *
      * @return static[]
      */
-    private function createChild(JobConfig $config, array $parentResults): array
+    private function createChild(JobConfig $config, array $parentResults, $length=0): array
     {
         // Clone and reset Scroller
         $scroller = clone $this->scroller;
@@ -236,6 +237,10 @@ class GenericExtractorJob
         $placeholders = !empty($config->getConfig()['placeholders']) ? $config->getConfig()['placeholders'] : [];
         if (empty($placeholders)) {
             $this->logger->warning("No 'placeholders' set for '".$config->getConfig()['endpoint']."'");
+        }
+
+        if ($length < 0 && $length < $placeholders) {
+            $placeholders = array_slice($placeholders, 0, $length);
         }
 
         foreach ($placeholders as $placeholder => $field) {
