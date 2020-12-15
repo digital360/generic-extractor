@@ -240,8 +240,14 @@ class GenericExtractorJob
         }
 
         $placeholderCount = count($placeholders);
+
+        echo "PlaceholderCount: $placeholderCount \n";
+        echo "Length: $length \n";
+
         if ($length < 0 && $length < $placeholderCount) {
             $placeholders = array_slice($placeholders, 0, $length);
+            echo "*********";
+            print_r($placeholders);
         }
 
         foreach ($placeholders as $placeholder => $field) {
@@ -333,6 +339,8 @@ class GenericExtractorJob
         try {
             if (!array_key_exists($level, $parentResults)) {
                 $maxLevel = empty($parentResults) ? 0 : max(array_keys($parentResults)) + 1;
+
+                print_r($parentResults);
                 throw new UserException(
                     "Level ".++$level." not found in parent results! Maximum level: ".$maxLevel
                 );
