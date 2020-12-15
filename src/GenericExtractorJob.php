@@ -100,6 +100,7 @@ class GenericExtractorJob
      * @var int
      */
     private $compatLevel;
+    private $replacement = '#REP#';
 
     /**
      * @param  JobConfig  $config
@@ -184,29 +185,38 @@ class GenericExtractorJob
                 // count left over
                 $leftOver = ($totalRecords - ($placeholderCount * $batch));
 
-                if ($placeholderCount <= 1 || $leftOver < $placeholderCount) {
+                if ($placeholderCount <= 1) {
                     array_unshift($parentResults, $result);
-
                     $childJobs = $this->createChild($child, $parentResults);
+
                     // run child jobs
                     foreach ($childJobs as $childJob) {
                         $childJob->run();
                     }
+
                     continue;
                 }
 
-                if ($count % $placeholderCount === 0) {
+                if ($count % $placeholderCount === 0 || ($leftOver > 0 && $leftOver < $placeholderCount)) {
                     $batch++;
 
                     $length = $placeholderCount;
                     $offset = ($count - $length);
+
+                    if ($leftOver < $placeholderCount) {
+                        $length = $leftOver;
+                    }
+
                     array_unshift($parentResults, array_slice($data, $offset, $length));
 
                     $childJobs = $this->createChild($child, $parentResults[0]);
                     // run child jobs
+
+                    echo "LEFT OVER: $leftOver \n";
                     foreach ($childJobs as $childJob) {
                         $childJob->run();
                     }
+                    
                     continue;
                 }
             }
@@ -236,6 +246,7 @@ class GenericExtractorJob
         foreach ($placeholders as $placeholder => $field) {
             $params[$placeholder] = $this->getPlaceholder($placeholder, $field, $parentResults);
         }
+
 
         // Add parent params as well (for 'tagging' child-parent data)
         // Same placeholder in deeper nesting replaces parent value
@@ -321,11 +332,7 @@ class GenericExtractorJob
     {
         try {
             if (!array_key_exists($level, $parentResults)) {
-                $maxLevel = empty($parentResults) ? 0 : max(array_keys($parentResults)) + 1;
-
-                throw new UserException(
-                    "Level ".++$level." not found in parent results! Maximum level: ".$maxLevel
-                );
+                return $this->replacement;
             }
 
             return getDataFromPath($field, $parentResults[$level], ".", false);
@@ -375,6 +382,11 @@ class GenericExtractorJob
             );
         }
 
+        // remove unwanted part from the endpoint
+        $endpoint = str_replace(','.$this->replacement, '', $this->config->getEndpoint());
+
+        $this->config->setEndpoint($endpoint);
+
         $this->parentParams = $params;
     }
 
@@ -397,6 +409,7 @@ class GenericExtractorJob
         $parentId = $this->getParentId();
 
         $request = $this->firstPage($this->config);
+
         while ($request !== false) {
             $response = $this->download($request);
 
