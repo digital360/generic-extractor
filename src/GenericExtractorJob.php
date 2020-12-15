@@ -239,7 +239,8 @@ class GenericExtractorJob
             $this->logger->warning("No 'placeholders' set for '".$config->getConfig()['endpoint']."'");
         }
 
-        if ($length < 0 && $length < $placeholders) {
+        $placeholderCount = count($placeholders);
+        if ($length < 0 && $length < $placeholderCount) {
             $placeholders = array_slice($placeholders, 0, $length);
         }
 
