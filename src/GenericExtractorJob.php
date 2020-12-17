@@ -209,7 +209,7 @@ class GenericExtractorJob
 
                     array_unshift($parentResults, array_slice($data, $offset, $length));
 
-                    $childJobs = $this->createChild($child, $parentResults[0]);
+                    $childJobs = $this->createChild($child, $parentResults);
                     // run child jobs
 
                     echo "LEFT OVER: $leftOver \n";
