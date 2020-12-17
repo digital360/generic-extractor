@@ -154,6 +154,7 @@ class GenericExtractorJob
      */
     private function runChildJobs(array $data)
     {
+        $totalRecords = count($data);
         foreach ($this->config->getChildJobs() as $jobId => $child) {
             $filter = null;
             if (!empty($child->getConfig()['recursionFilter'])) {
@@ -169,7 +170,6 @@ class GenericExtractorJob
             $placeholderCount = count(!empty($child->getConfig()['placeholders']) ? $child->getConfig()['placeholders'] : []);
 
             $count = 0;
-            $totalRecords = count($data);
             $batch = 0;
             foreach ($data as $k => $result) {
                 // increase the counter
@@ -198,16 +198,11 @@ class GenericExtractorJob
                 }
 
                 if ($count % $placeholderCount === 0 || ($leftOver > 0 && $leftOver < $placeholderCount)) {
-
                     echo "LEFT OVER: $leftOver \n";
 
-                    $length = $placeholderCount;
 
-                    if ($totalRecords - $leftOver == 0) {
-                        $offset = 0;
-                    } else {
-                        $offset = max(($placeholderCount * $batch) - 1, 0);
-                    }
+                    $length = $placeholderCount;
+                    $offset = max(($placeholderCount * $batch), 0);
 
                     if ($leftOver < $placeholderCount) {
                         $length = $leftOver;
@@ -215,7 +210,6 @@ class GenericExtractorJob
 
                     array_unshift($parentResults, array_slice($data, $offset, $length));
 
-                    //print_r([$parentResults,$data[0],$offset, $length]);
                     $childJobs = $this->createChild($child, $parentResults[0]);
 
                     // run child jobs

@@ -109,7 +109,6 @@ class Extractor
     private function loadJSONFile(string $dataDir, string $name): array
     {
         $fileName = $dataDir.DIRECTORY_SEPARATOR.$name;
-        echo $fileName."\n";
         if (!file_exists($fileName)) {
             throw new ApplicationException("Configuration file '$fileName' not found.");
         }
