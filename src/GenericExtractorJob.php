@@ -173,7 +173,7 @@ class GenericExtractorJob
             $batch = 0;
             foreach ($data as $k => $result) {
                 // increase the counter
-                ++$count;
+                $count++;
 
                 if (!empty($filter) && ($filter->compareObject((object) $result) == false)) {
                     continue;
@@ -198,21 +198,15 @@ class GenericExtractorJob
                 }
 
                 if ($count % $placeholderCount === 0 || ($leftOver > 0 && $leftOver < $placeholderCount)) {
-                    $batch++;
 
                     echo "LEFT OVER: $leftOver \n";
 
                     $length = $placeholderCount;
-                    $tmpOffset = $totalRecords - $leftOver;
 
-                    if ($tmpOffset <= $placeholderCount) {
-                        if ($tmpOffset - 1 < 0) {
-                            $offset = 0;
-                        } else {
-                            $offset = $tmpOffset - 1;
-                        }
-                    } else {
+                    if ($totalRecords - $leftOver == 0) {
                         $offset = 0;
+                    } else {
+                        $offset = max(($placeholderCount * $batch) - 1, 0);
                     }
 
                     if ($leftOver < $placeholderCount) {
@@ -221,6 +215,7 @@ class GenericExtractorJob
 
                     array_unshift($parentResults, array_slice($data, $offset, $length));
 
+                    //print_r([$parentResults,$data[0],$offset, $length]);
                     $childJobs = $this->createChild($child, $parentResults[0]);
 
                     // run child jobs
@@ -228,6 +223,7 @@ class GenericExtractorJob
                         $childJob->run();
                     }
 
+                    $batch++;
                     continue;
                 }
             }
